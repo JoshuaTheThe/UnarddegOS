@@ -6,6 +6,7 @@
 void VFSCreateDevices(void)
 {
         // Initialise Root
+        VNodeDefault(RootVNode());
         RootVNode()->Name.Name = "root";
         RootVNode()->Name.Length = 4;
 

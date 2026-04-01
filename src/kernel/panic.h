@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <serial.h>
 
-#define Panic(Code) PanicImpl(__FILE__, __LINE__, Code)
+#define Panic(Code) PanicImpl(__FILE__, __LINE__, Code, #Code)
 #define PanicIfNull(e) do { if (e == NULL) Panic(PANIC_NULL_POINTER_DEREFERENCE); } while (0)
 
 #define DEBUG
@@ -26,6 +26,7 @@ typedef enum
         PANIC_NULL_POINTER_DEREFERENCE,
         PANIC_UNINTENDED_CALL,
         PANIC_TRACE_OVERFLOW,
+        PANIC_NOT_FOUND,
 } PanicCode;
 
 typedef struct
@@ -35,7 +36,7 @@ typedef struct
         long        Line;
 } TraceEntry;
 
-_Noreturn void PanicImpl(const char *const File, long Line, PanicCode Code);
+_Noreturn void PanicImpl(const char *const File, long Line, PanicCode Code, const char *const CodeAsStr);
 void TraceImpl(const char *const File, const char *const Func, long Line);
 void ExitTraceImpl(const char *const File, const char *const Func, long Line);
 

@@ -19,7 +19,7 @@ typedef void (*VNodeRWFunction)(
 
 typedef void (*VNodeFunction)(struct VNode *const Node);
 typedef void (*VNodeConstructFunction)(struct VNode *const Node, unsigned long MaxDepth);
-typedef struct VNode *(*VNodeFindFunction)(struct VNode *Base, const char *const RelativePath);
+typedef struct VNode *(*VNodeFindFunction)(struct VNode *Base, const char *const RelativePath, unsigned long RelativePathLength);
 
 typedef unsigned char VNodeFlags;
 

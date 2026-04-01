@@ -6,7 +6,7 @@ void ArchInitialise(void) {}
 
 const char *ArchIdentify(void)
 {
-        static const char *Architecture = "ISA: Arm32,Arm/v7\r\nCPU: cortex-a15";
+        static const char *Architecture = " [Info] ISA: Arm32,Arm/v7, CPU: cortex-a15";
         return Architecture;
 }
 

@@ -6,7 +6,7 @@ void ArchInitialise(void) {}
 
 const char *ArchIdentify(void)
 {
-        static const char *Architecture = "ISA: RISCV\r\nCPU: Generic";
+        static const char *Architecture = " [Info] ISA: RISCV, CPU: Generic";
         return Architecture;
 }
 
