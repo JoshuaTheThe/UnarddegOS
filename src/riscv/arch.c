@@ -4,9 +4,9 @@
 // Stub
 void ArchInitialise(void) {}
 
-const char *ArchIdentify(void)
+char *ArchIdentify(void)
 {
-        static const char *Architecture = " [Info] ISA: RISCV, CPU: Generic";
+        static char *Architecture = " [Info] ISA: RISCV, CPU: Generic\n";
         return Architecture;
 }
 

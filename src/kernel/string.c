@@ -23,3 +23,15 @@ int unsafe_strncmp(const char *const Lhs, const char *const Rhs, unsigned long L
         }
         return 0;
 }
+
+int strnlen(char *const A, unsigned long Len)
+{
+        for (unsigned long i = 0; i < Len; ++i)
+        {
+                if (A[i])
+                        continue;
+                return i;
+        }
+
+        return Len;
+}

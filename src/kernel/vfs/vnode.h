@@ -11,7 +11,7 @@
 
 struct VNode;
 
-typedef void (*VNodeRWFunction)(
+typedef int (*VNodeRWFunction)(
         void *const Buf,
         const unsigned long Size,
         const unsigned long Elements,
@@ -44,6 +44,7 @@ typedef struct VNode
                               *Next,
                               *Previous,
                               *Link; // Link for say, Mount or SymLink
+        void                  *DriverData;
         VNodeRWFunction        ReadFunction;
         VNodeRWFunction        WriteFunction;
         VNodeConstructFunction ConstructChildren; // for Drives // Directories

@@ -4,9 +4,9 @@
 // Stub
 void ArchInitialise(void) {}
 
-const char *ArchIdentify(void)
+char *ArchIdentify(void)
 {
-        static const char *Architecture = " [Info] ISA: Intel Architecture / 32,x86, CPU: i386";
+        static char *Architecture = " [Info] ISA: Intel Architecture / 32,x86, CPU: i386\n";
         return Architecture;
 }
 

@@ -8,7 +8,23 @@ VNode Root = {0};
 
 // to prevent edge cases
 // for directories // drives, this would read from the RAW drive or error on dir
-static void DefaultReadFunction(void *const Buf,
+static int DefaultReadFunction(void *const Buf,
+                               const unsigned long Size,
+                               const unsigned long Elements,
+                               VNode *Node)
+{
+        PanicIfNull(Buf);
+        PanicIfNull(Node);
+        (void)Buf;
+        (void)Size;
+        (void)Elements;
+        (void)Node;
+        Panic(PANIC_UNINTENDED_CALL);
+        return 0;
+}
+
+// for directories // drives, this would write to the RAW drive or error on dir
+static int DefaultWriteFunction(void *const Buf,
                                 const unsigned long Size,
                                 const unsigned long Elements,
                                 VNode *Node)
@@ -20,21 +36,7 @@ static void DefaultReadFunction(void *const Buf,
         (void)Elements;
         (void)Node;
         Panic(PANIC_UNINTENDED_CALL);
-}
-
-// for directories // drives, this would write to the RAW drive or error on dir
-static void DefaultWriteFunction(void *const Buf,
-                                 const unsigned long Size,
-                                 const unsigned long Elements,
-                                 VNode *Node)
-{
-        PanicIfNull(Buf);
-        PanicIfNull(Node);
-        (void)Buf;
-        (void)Size;
-        (void)Elements;
-        (void)Node;
-        Panic(PANIC_UNINTENDED_CALL);
+        return 0;
 }
 
 // create a node tree of children from disk
@@ -139,6 +141,7 @@ void VNodeDefault(VNode *Node)
         Node->Next                     = NULL;
         Node->Previous                 = NULL;
         Node->FirstChild               = NULL;
+        Node->DriverData               = NULL;
 }
 
 VNode *NewVNode(VNodeFlags Flags)
