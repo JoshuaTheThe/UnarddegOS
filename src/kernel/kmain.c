@@ -6,6 +6,7 @@
 #include <vfs/vnode.h>
 #include <vfs/vdev.h>
 #include <string.h>
+#include <sched/core.h>
 
 void kmain(void)
 {
@@ -13,6 +14,7 @@ void kmain(void)
         static char InputString[16];
         VNode *tty0;
         Trace(ArchInitialise());
+        Trace(SchedInit());
         Trace(VFSCreateDevices());
         Trace(tty0 = RootVNode()->RelativeFind(RootVNode(), "/dev/tty0", 9));
         tty0->WriteFunction(ArchIdentify(), strnlen(ArchIdentify(), 64), 1, tty0);
