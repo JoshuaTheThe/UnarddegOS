@@ -5,6 +5,6 @@
 #include <sched/task.h>
 #include <stdint.h>
 
-void SchedInit(void);
+void SchedulerInitialise(void);
 
 #endif

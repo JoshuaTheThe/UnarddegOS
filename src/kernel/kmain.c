@@ -14,8 +14,8 @@ void kmain(void)
         static char InputString[16];
         VNode *tty0;
         Trace(ArchInitialise());
-        Trace(SchedInit());
         Trace(VFSCreateDevices());
+        Trace(SchedulerInitialise());
         Trace(tty0 = RootVNode()->RelativeFind(RootVNode(), "/dev/tty0", 9));
         tty0->WriteFunction(ArchIdentify(), strnlen(ArchIdentify(), 64), 1, tty0);
         tty0->WriteFunction(Message, sizeof(Message), 1, tty0);
