@@ -4,7 +4,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <serial.h>
+#include <drivers/serial.h>
 
 #define Panic(Code) PanicImpl(__FILE__, __LINE__, Code, #Code)
 #define PanicIfNull(e) do { if ((e) == NULL) Panic(PANIC_NULL_POINTER_DEREFERENCE); } while (0)

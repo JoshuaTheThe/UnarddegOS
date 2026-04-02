@@ -5,7 +5,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define PL011_BASE  0x1c090000
+// why cant people just agree on shit
+#ifdef __ARCH_OVERRIDE_SERIAL_ADDRESS
+        #define PL011 __ARCH_OVERRIDE_SERIAL_ADDRESS
+#else
+        #define PL011_BASE  0x1c090000
+#endif
+
 #define PL011_DR    (*(volatile uint32_t *)(PL011_BASE + 0x00)) // Data Register
 #define PL011_FR    (*(volatile uint32_t *)(PL011_BASE + 0x18)) // Flag Register
 #define PL011_IBRD  (*(volatile uint32_t *)(PL011_BASE + 0x24)) // Integer Baud Rate

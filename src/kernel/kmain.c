@@ -1,5 +1,5 @@
 
-#include <serial.h>
+#include <drivers/serial.h>
 #include <panic.h>
 #include <vmem/bumpalloc.h>
 #include <arch.h>

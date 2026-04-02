@@ -1,6 +1,6 @@
 
 #include <panic.h>
-#include <serial.h>
+#include <drivers/serial.h>
 #include <arch.h>
 #include <string.h>
 
