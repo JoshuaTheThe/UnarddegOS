@@ -1,7 +1,7 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
-#include <common/serial.h>
+#include <drivers/common_serial.h>
 
 #define SERIAL_PORT 0x10000000   // Example RISC-V UART base address
 #define SERIAL_IER   (SERIAL_PORT + 1)  // Interrupt Enable Register

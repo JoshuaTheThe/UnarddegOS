@@ -1,7 +1,7 @@
 
 #include <vfs/vnode.h>
 #include <vfs/dev/serial.h>
-#include <common/serial.h>
+#include <drivers/serial.h>
 #include <vmem/bumpalloc.h>
 #include <panic.h>
 
