@@ -108,7 +108,7 @@ static VNode *DefaultRelativeFindFunction(VNode *Base, const char *const Relativ
                         while (Child != NULL)
                         {
                                 if (TempLength == Child->Name.Length &&
-                                    !unsafe_strncmp(Child->Name.Name, TempBuffer, Child->Name.Length))
+                                    !strncmp(Child->Name.Name, TempBuffer, Child->Name.Length))
                                 {
                                         CurrentNode = Child;
                                         break;
