@@ -57,7 +57,8 @@ static void SchedulerCreateProc(TaskRegisters InitialState)
 
 void SchedulerInitialise(void)
 {
-        TaskRegisters InitialState = {0};
+        TaskRegisters InitialState;
+	memset(&InitialState, 0, sizeof(InitialState));
         SchedulerCreateProcDir();
 
 	// kernel proc
