@@ -12,8 +12,10 @@ void memset(void *p, int v, long l)
         }
 }
 
-int unsafe_strncmp(const char *const Lhs, const char *const Rhs, unsigned long Len)
+int strncmp(const char *const Lhs, const char *const Rhs, unsigned long Len)
 {
+        PanicIfNull(Lhs);
+        PanicIfNull(Rhs);
         for (unsigned long i = 0; i < Len; i++)
         {
                 if (Lhs[i] != Rhs[i] || Lhs[i] == '\0')
@@ -26,6 +28,7 @@ int unsafe_strncmp(const char *const Lhs, const char *const Rhs, unsigned long L
 
 int strnlen(char *const A, unsigned long Len)
 {
+        PanicIfNull(A);
         for (unsigned long i = 0; i < Len; ++i)
         {
                 if (A[i])
@@ -34,4 +37,14 @@ int strnlen(char *const A, unsigned long Len)
         }
 
         return Len;
+}
+
+void memcpy(void *Destination, const void *const Source, const unsigned long Len)
+{
+        PanicIfNull(Destination);
+        PanicIfNull(Source);
+        for (unsigned long i = 0; i < Len; ++i)
+        {
+                ((char *)Destination)[i] = ((char *)Source)[i];
+        }
 }

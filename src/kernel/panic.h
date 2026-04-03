@@ -27,6 +27,7 @@ typedef enum
         PANIC_UNINTENDED_CALL,
         PANIC_TRACE_OVERFLOW,
         PANIC_NOT_FOUND,
+        PANIC_SEGMENTATION_FAULT,
 } PanicCode;
 
 typedef struct

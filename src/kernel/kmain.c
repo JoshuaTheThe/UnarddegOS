@@ -20,6 +20,7 @@ void kmain(void)
         tty0->WriteFunction(ArchIdentify(), strnlen(ArchIdentify(), 64), 1, tty0);
         tty0->WriteFunction(Message, sizeof(Message), 1, tty0);
         tty0->ReadFunction(InputString, sizeof(InputString) - 1, 1, tty0);
+        Trace(VNListTree(RootVNode(), 1));
         Panic(PANIC_TODO);
         while(1);
 }
