@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#define MEMORY_SIZE (1024 * 64)
+#define MEMORY_SIZE (1024 * 128)
 #define ALIGNMENT 8
 
 void *BumpAllocate(size_t size);
