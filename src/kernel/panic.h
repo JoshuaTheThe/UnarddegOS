@@ -28,8 +28,8 @@ typedef enum
         PANIC_TRACE_OVERFLOW,
         PANIC_NOT_FOUND,
         PANIC_SEGMENTATION_FAULT,
-	PANIC_DOUBLE_OPEN,
-	PANIC_FD_NOT_FOUND,
+        PANIC_DOUBLE_OPEN,
+        PANIC_FD_NOT_FOUND,
 } PanicCode;
 
 typedef struct

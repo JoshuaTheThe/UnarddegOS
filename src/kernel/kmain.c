@@ -16,10 +16,10 @@ void kmain(void)
         Trace(ArchInitialise());
         Trace(VFSCreateDevices());
         Trace(SchedulerInitialise());
-	FileDescriptor File = open("/dev/tty0", 0);
-	write(File, ArchIdentify(), strnlen(ArchIdentify(), 64));
-	write(File, Message, sizeof(Message));
-	read(File, InputString, sizeof(InputString) - 1);
+        FileDescriptor File = open("/dev/tty0", 0);
+        write(File, ArchIdentify(), strnlen(ArchIdentify(), 64));
+        write(File, Message, sizeof(Message));
+        read(File, InputString, sizeof(InputString) - 1);
         Trace(VNListTree(RootVNode(), 1));
         Panic(PANIC_TODO);
         while(1);

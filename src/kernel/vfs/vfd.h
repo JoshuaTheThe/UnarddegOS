@@ -14,18 +14,18 @@ typedef unsigned long FileDescriptor;
 
 typedef struct _FileDescriptor
 {
-	VNode                  *Reference;
-	struct _FileDescriptor *Next;
-	FileDescriptor          FileIndex;
+        VNode                  *Reference;
+        struct _FileDescriptor *Next;
+        FileDescriptor          FileIndex;
 } _FileDescriptor;
 
 FileDescriptor open(char *const PathFromRoot, VNodeFlags Flags);
 unsigned long write(FileDescriptor fd,
-		    void *const Buf,
-		    unsigned long Count);
+                    void *const Buf,
+                    unsigned long Count);
 unsigned long read(FileDescriptor fd,
-		   void *const Buf,
-		   unsigned long Count);
+                   void *const Buf,
+                   unsigned long Count);
 // close would follow but there is no way to free memory (yet)
 
 #endif

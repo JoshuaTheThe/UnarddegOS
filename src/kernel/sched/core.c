@@ -48,8 +48,8 @@ static void SchedulerCreateProc(TaskRegisters InitialState)
         New->DriverData = BumpAllocate(sizeof(Task));
         New->WriteFunction = TaskWriteFunction;
         New->ReadFunction  = TaskReadFunction;
-	New->Name.Name     = UlToString(ProgramIdentifier);
-	New->Name.Length   = sizeof(unsigned long) * 4 + 1;
+        New->Name.Name     = UlToString(ProgramIdentifier);
+        New->Name.Length   = sizeof(unsigned long) * 4 + 1;
         ((Task *)New->DriverData)->Registers = InitialState;
         ((Task *)New->DriverData)->ProgramIdentifier = ProgramIdentifier++;
         RegisterChildVNode(Proc, New);
@@ -58,13 +58,13 @@ static void SchedulerCreateProc(TaskRegisters InitialState)
 void SchedulerInitialise(void)
 {
         TaskRegisters InitialState;
-	memset(&InitialState, 0, sizeof(InitialState));
+        memset(&InitialState, 0, sizeof(InitialState));
         SchedulerCreateProcDir();
 
-	// kernel proc
+        // kernel proc
         SchedulerCreateProc(InitialState);
-	
-	// test
-	for (int i = 0; i < 32; ++i)
-	        SchedulerCreateProc(InitialState);
+        
+        // test
+        for (int i = 0; i < 32; ++i)
+                SchedulerCreateProc(InitialState);
 }

@@ -5,24 +5,24 @@
 
 char *UlToString(unsigned long Number)
 {
-	// each byte requires at most three digits
-	char *const String = BumpAllocate(sizeof(Number) * 4 + 1);
-	unsigned long i;
-	for (i = 0; i < sizeof(Number) * 3; ++i)
-	{
-		String[i] = (Number % 10) + '0';
-		Number /= 10;
-		if (Number == 0) break;
-	}
+        // each byte requires at most three digits
+        char *const String = BumpAllocate(sizeof(Number) * 4 + 1);
+        unsigned long i;
+        for (i = 0; i < sizeof(Number) * 3; ++i)
+        {
+                String[i] = (Number % 10) + '0';
+                Number /= 10;
+                if (Number == 0) break;
+        }
 
-	for (unsigned long j = 0; j < i; ++j)
-	{
-		char Temporary = String[j];
-		String[j] = String[i - j];
-		String[i - j] = Temporary;
-	}
+        for (unsigned long j = 0; j < i; ++j)
+        {
+                char Temporary = String[j];
+                String[j] = String[i - j];
+                String[i - j] = Temporary;
+        }
 
-	return String;
+        return String;
 }
 
 void memset(void *p, int v, long l)
