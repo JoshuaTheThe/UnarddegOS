@@ -8,6 +8,7 @@
 #define VFS_SYSTEM  (0x08)
 #define VFS_LINK    (0x10)
 #define VFS_MOUNTED (0x20) // treat the linked file as a device // directory
+#define VFS_OPENED  (0x40)
 
 struct VNode;
 

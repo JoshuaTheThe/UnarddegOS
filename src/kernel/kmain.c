@@ -5,6 +5,7 @@
 #include <arch.h>
 #include <vfs/vnode.h>
 #include <vfs/vdev.h>
+#include <vfs/vfd.h>
 #include <string.h>
 #include <sched/core.h>
 
@@ -12,14 +13,13 @@ void kmain(void)
 {
         static char Message[] = " [Info] Found tty0 VNode Successfully\n";
         static char InputString[16];
-        VNode *tty0;
         Trace(ArchInitialise());
         Trace(VFSCreateDevices());
         Trace(SchedulerInitialise());
-        Trace(tty0 = RootVNode()->RelativeFind(RootVNode(), "/dev/tty0", 9));
-        tty0->WriteFunction(ArchIdentify(), strnlen(ArchIdentify(), 64), 1, tty0);
-        tty0->WriteFunction(Message, sizeof(Message), 1, tty0);
-        tty0->ReadFunction(InputString, sizeof(InputString) - 1, 1, tty0);
+	FileDescriptor File = open("/dev/tty0", 0);
+	write(File, ArchIdentify(), strnlen(ArchIdentify(), 64));
+	write(File, Message, sizeof(Message));
+	read(File, InputString, sizeof(InputString) - 1);
         Trace(VNListTree(RootVNode(), 1));
         Panic(PANIC_TODO);
         while(1);
