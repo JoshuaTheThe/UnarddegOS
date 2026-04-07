@@ -80,13 +80,13 @@ if it has children, declare as a directory for that file system, then, create a 
 
 ```c
 // iterate a file
-int base = open("/path/to/thing", 0);
+int base = open("/path/to/thing", O_RDONLY | O_LAZY);
 chdir(base); // unlike UNIX, we use an fd
-int fd = open("~first",0); // os doesn't care about flags currently
+int fd = open("~first", O_RDONLY | O_LAZY);
 do
 {
         close(fd);
-        fd = open("~next", 0);
+        fd = open("~next", O_RDONLY | O_LAZY);
 }
 while (fd != -1);
 close(base);
