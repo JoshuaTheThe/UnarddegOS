@@ -49,7 +49,7 @@ int strncmp(const char *const Lhs, const char *const Rhs, unsigned long Len)
         return 0;
 }
 
-int strnlen(char *const A, unsigned long Len)
+int strnlen(const char *const A, unsigned long Len)
 {
         PanicIfNull(A);
         for (unsigned long i = 0; i < Len; ++i)

@@ -49,7 +49,7 @@ static void SchedulerCreateProc(TaskRegisters InitialState)
         New->WriteFunction = TaskWriteFunction;
         New->ReadFunction  = TaskReadFunction;
         New->Name.Name     = UlToString(ProgramIdentifier);
-        New->Name.Length   = sizeof(unsigned long) * 4 + 1;
+        New->Name.Length   = strnlen(New->Name.Name, 32);
         ((Task *)New->DriverData)->Registers = InitialState;
         ((Task *)New->DriverData)->ProgramIdentifier = ProgramIdentifier++;
         RegisterChildVNode(Proc, New);
