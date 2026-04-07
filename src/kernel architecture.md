@@ -77,3 +77,15 @@ struct
 - as dirs can hold data, this is required.
 
 if it has children, declare as a directory for that file system, then, create a file named "~self" inside it, which holds it's data.
+
+```c
+// iterate a file
+int fd = open("~first",0); // os doesn't care about flags currently
+while (fd != -1)
+{
+        close(fd);
+        fd = open("~next", 0);
+}
+if (fd != -1)
+        close(fd);
+```
