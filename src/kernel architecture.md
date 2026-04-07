@@ -35,6 +35,7 @@ struct
 | `d` | `fork` | `ProcessFork` | No. |
 | `e` | `exec` | `ProcessFromPath` | No. |
 | `f` | `pipe` | `OverrideProcessInput` | No. |
+| `10`-`1f` | * | same but using path instead of pid//fd | No. |
 
 ### MMap and MUnMap
 - these are done using `/sys/mem`, write to free, read to allocate
