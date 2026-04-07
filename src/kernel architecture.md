@@ -82,7 +82,7 @@ if it has children, declare as a directory for that file system, then, create a 
 ```c
 // iterate a file
 int base = open("/path/to/thing", O_RDONLY | O_LAZY);
-chdir(base); // unlike UNIX, we use an fd
+fdchdir(base);
 int fd = open("~first", O_RDONLY | O_LAZY);
 do
 {
