@@ -91,3 +91,10 @@ do
 while (fd != -1);
 close(base);
 ```
+
+### note
+flags | 0x80 (open) means DONT refresh/fetch from disk, just use whatever is in the VFS already
+minor performance for cached files, as files aren't removed from memory until
+- caller proc ends or invokes an action that changes it (e.g. chdir)
+
+meaning you can flush commits // closed files using `chdir(.)`
