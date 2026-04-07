@@ -81,11 +81,10 @@ if it has children, declare as a directory for that file system, then, create a 
 ```c
 // iterate a file
 int fd = open("~first",0); // os doesn't care about flags currently
-while (fd != -1)
+do
 {
         close(fd);
         fd = open("~next", 0);
 }
-if (fd != -1)
-        close(fd);
+while (fd != -1);
 ```
