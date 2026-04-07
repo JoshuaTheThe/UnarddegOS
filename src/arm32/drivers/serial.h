@@ -1,7 +1,7 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
-#include <drivers/common_serial.h>
+#include <drivers/_serial.h>
 #include <stdint.h>
 #include <stdbool.h>
 

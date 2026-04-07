@@ -1,7 +1,7 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
-#include <drivers/common_serial.h>
+#include <drivers/_serial.h>
 
 #define SERIAL_PORT 0x3F8
 #define SERIAL_IER  (SERIAL_PORT + 1)  // Interrupt Enable Register
