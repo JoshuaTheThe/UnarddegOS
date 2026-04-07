@@ -63,7 +63,8 @@ struct
 | `[path]/~previous` | Previous Sibling | F |
 | `[path]/~first` | First Child | F |
 | `[path]/~last` | Last Child | F |
-| `[path]/~parent` | Parent | F |
+| `[path]/~parent` | Parent File | F |
+| `[path]/~self` | echo Self | F |
 
 #### Process Flags
 
@@ -71,3 +72,8 @@ struct
 | - | - |
 | `0` | Paused? |
 | `1` | User? (protected) |
+
+# Semantics for translation to disk
+- as dirs can hold data, this is required.
+
+if it has children, declare as a directory for that file system, then, create a file named "~self" inside it, which holds it's data.
