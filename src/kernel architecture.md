@@ -80,6 +80,8 @@ if it has children, declare as a directory for that file system, then, create a 
 
 ```c
 // iterate a file
+int base = open("/path/to/thing", 0);
+chdir(base); // unlike UNIX, we use an fd
 int fd = open("~first",0); // os doesn't care about flags currently
 do
 {
@@ -87,4 +89,5 @@ do
         fd = open("~next", 0);
 }
 while (fd != -1);
+close(base);
 ```
