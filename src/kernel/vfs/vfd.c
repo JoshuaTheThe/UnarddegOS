@@ -42,6 +42,7 @@ static FileDescriptor CreateEntry(VNode *Node)
         return Current++;
 }
 
+// snippet from my vfs impl
 FileDescriptor open(char *const PathFromRoot, VNodeFlags Flags)
 {
         (void)Flags;
@@ -51,8 +52,7 @@ FileDescriptor open(char *const PathFromRoot, VNodeFlags Flags)
         PanicIfNull(Node);
         if (Node->Flags & VFS_OPENED)
                 Panic(PANIC_DOUBLE_OPEN);
-        CreateEntry(Node);
-        return (FileDescriptor)0;
+        return CreateEntry(Node);
 }
 
 unsigned long write(FileDescriptor fd,
