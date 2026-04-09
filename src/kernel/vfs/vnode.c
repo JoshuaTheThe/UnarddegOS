@@ -63,44 +63,74 @@ static VNode *DefaultRelativeFindFunction(VNode *Base, const char *const Relativ
         PanicIfNull(RelativePath);
         static char TempBuffer[128];
         VNode *CurrentNode = Base;
-        for (unsigned long i = 0; i < RelativePathLength; ++i)
+
+        unsigned long i = 0;
+        if (RelativePathLength > 0 && RelativePath[0] == '/')
+        {
+                CurrentNode = RootVNode();
+                i = 1;
+        }
+
+        while (i < RelativePathLength)
         {
                 PanicIfNull(CurrentNode);
+                if (RelativePath[i] == '/')
+                {
+                        ++i;
+                        continue;
+                }
+
                 unsigned long TempLength = 0;
-                // Copy until a seperator charater
-                for (unsigned long j = 0; j < sizeof(TempBuffer) - 1 && i + j < RelativePathLength; ++j)
+                while (i + TempLength < RelativePathLength &&
+                       RelativePath[i + TempLength] != '/' &&
+                       TempLength < sizeof(TempBuffer) - 1)
                 {
-                        TempLength += 1;
-                        TempBuffer[j] = TempBuffer[j + 1] = 0;
-                        if (RelativePath[i+j] == '/')
-                        {
-                                if (TempLength == 1)
-                                        TempBuffer[0] = '/';
-                                TempLength -= 1;
-                                break;
-                        }
-                        TempBuffer[j] = RelativePath[i+j];
+                        TempBuffer[TempLength] = RelativePath[i + TempLength];
+                        ++TempLength;
                 }
+                TempBuffer[TempLength] = 0;
+                i += TempLength;
 
-                // Update by N bytes
-                if (TempLength != 0)
-                {
-                        i += TempLength;
-                }
+                if (TempLength == 0)
+                        continue;
 
-                // Traverse to Parent
-                if (TempLength == 2 && TempBuffer[1] == '.' && TempBuffer[0] == '.')
+                if ((TempLength == 2 && TempBuffer[0] == '.' && TempBuffer[1] == '.') ||
+                    (TempLength == 7 && !strncmp(TempBuffer, "~parent", 7)))
                 {
                         if (CurrentNode != RootVNode())
                                 CurrentNode = CurrentNode->Parent;
                 }
-                // Traverse to Self
-                else if (TempLength == 1 && TempBuffer[0] == '.')
-                {;}
-                // Traverse to Root
-                else if (TempLength == 0 && TempBuffer[0] == '/')
+                else if ((TempLength == 1 && TempBuffer[0] == '.') ||
+                         (TempLength == 5 && !strncmp(TempBuffer, "~self", 5)))
                 {
-                        CurrentNode = RootVNode();
+                        /* stay on current node */
+                }
+                else if (TempLength == 5 && !strncmp(TempBuffer, "~next", 5))
+                {
+                        if (CurrentNode->Next == NULL)
+                                Panic(PANIC_NOT_FOUND);
+                        CurrentNode = CurrentNode->Next;
+                }
+                else if (TempLength == 9 && !strncmp(TempBuffer, "~previous", 9))
+                {
+                        if (CurrentNode->Previous == NULL)
+                                Panic(PANIC_NOT_FOUND);
+                        CurrentNode = CurrentNode->Previous;
+                }
+                else if (TempLength == 6 && !strncmp(TempBuffer, "~first", 6))
+                {
+                        if (CurrentNode->FirstChild == NULL)
+                                Panic(PANIC_NOT_FOUND);
+                        CurrentNode = CurrentNode->FirstChild;
+                }
+                else if (TempLength == 5 && !strncmp(TempBuffer, "~last", 5))
+                {
+                        if (CurrentNode->FirstChild == NULL)
+                                Panic(PANIC_NOT_FOUND);
+                        VNode *Last = CurrentNode->FirstChild;
+                        while (Last->Next)
+                                Last = Last->Next;
+                        CurrentNode = Last;
                 }
                 else
                 {
@@ -108,7 +138,7 @@ static VNode *DefaultRelativeFindFunction(VNode *Base, const char *const Relativ
                         while (Child != NULL)
                         {
                                 if (TempLength == Child->Name.Length &&
-                                    !strncmp(Child->Name.Name, TempBuffer, Child->Name.Length))
+                                    !strncmp(Child->Name.Name, TempBuffer, TempLength))
                                 {
                                         CurrentNode = Child;
                                         break;
@@ -116,12 +146,10 @@ static VNode *DefaultRelativeFindFunction(VNode *Base, const char *const Relativ
                                 Child = Child->Next;
                         }
                         if (Child == NULL)
-                        {
                                 Panic(PANIC_NOT_FOUND);
-                        }
                 }
-                TempLength = 0;
         }
+
         return CurrentNode;
 }
 
@@ -129,19 +157,19 @@ void VNodeDefault(VNode *Node)
 {
         PanicIfNull(Node);
         static char *const DefaultName = "~UnknownVNode";
-        Node->ReadFunction             = DefaultReadFunction;
-        Node->WriteFunction            = DefaultWriteFunction;
-        Node->DestroyChildren          = DefaultDestroyChildrenFunction;
-        Node->ConstructChildren        = DefaultConstructChildrenFunction;
-        Node->RelativeFind             = DefaultRelativeFindFunction;
-        Node->Name.Name                = DefaultName;
-        Node->Name.Length              = sizeof(DefaultName);
-        Node->Link                     = NULL;
-        Node->Parent                   = NULL;
-        Node->Next                     = NULL;
-        Node->Previous                 = NULL;
-        Node->FirstChild               = NULL;
-        Node->DriverData               = NULL;
+        Node->ReadFunction = DefaultReadFunction;
+        Node->WriteFunction = DefaultWriteFunction;
+        Node->DestroyChildren = DefaultDestroyChildrenFunction;
+        Node->ConstructChildren = DefaultConstructChildrenFunction;
+        Node->RelativeFind = DefaultRelativeFindFunction;
+        Node->Name.Name = DefaultName;
+        Node->Name.Length = sizeof(DefaultName);
+        Node->Link = NULL;
+        Node->Parent = NULL;
+        Node->Next = NULL;
+        Node->Previous = NULL;
+        Node->FirstChild = NULL;
+        Node->DriverData = NULL;
 }
 
 VNode *NewVNode(VNodeFlags Flags)
