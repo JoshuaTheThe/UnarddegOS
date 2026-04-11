@@ -6,7 +6,7 @@
 char *UlToString(unsigned long Number)
 {
         // each byte requires at most three digits
-        char *const String = BumpAllocate(sizeof(Number) * 4 + 1);
+        char *const String = BumpAllocate(sizeof(Number) * 8);
         unsigned long i;
         for (i = 0; i < sizeof(Number) * 3; ++i)
         {

@@ -3,8 +3,33 @@
 #include <vmem/bumpalloc.h>
 #include <panic.h>
 #include <string.h>
+#include <sched/trap.h>
 
-static const char *ProcDir = "proc";
+VNode *CurrentProc = NULL, *Proc = NULL;
+Task ScratchProc = {0};
+static const char ProcDir[] = "proc";
+
+void CommitProcessSave(void)
+{
+        CurrentProc->WriteFunction(&ScratchProc, 1, sizeof(Task), CurrentProc);
+}
+
+void CommitProcessLoad(void)
+{
+        CurrentProc->ReadFunction(&ScratchProc, 1, sizeof(Task), CurrentProc);
+}
+
+void CommitNextProcess(void)
+{
+        CurrentProc = CurrentProc->Next;
+        if (CurrentProc == NULL)
+        {
+                CurrentProc = Proc->FirstChild;
+        }
+
+        EnableNextProcess();
+        CommitProcessLoad();
+}
 
 static int TaskWriteFunction(void *const Buf,
                              const unsigned long Size,
@@ -15,7 +40,7 @@ static int TaskWriteFunction(void *const Buf,
         if (Bytes > sizeof(Task))
                 Panic(PANIC_SEGMENTATION_FAULT);
         else
-                memcpy(Buf, Self->DriverData, Bytes);
+                memcpy(Self->DriverData, Buf, Bytes);
         return Bytes;
 }
 
@@ -40,10 +65,10 @@ static void SchedulerCreateProcDir(void)
         RegisterChildVNode(RootVNode(), Proc);
 }
 
-static void SchedulerCreateProc(TaskRegisters InitialState)
+static VNode *SchedulerCreateProc(TaskRegisters InitialState)
 {
         static uint64_t ProgramIdentifier = 0;
-        VNode *Proc     = RootVNode()->RelativeFind(RootVNode(), ProcDir, sizeof(ProcDir) - 1);
+        Proc            = RootVNode()->RelativeFind(RootVNode(), ProcDir, sizeof(ProcDir) - 1);
         VNode *New      = NewVNode(VFS_SYSTEM | VFS_READ | VFS_WRITE);
         New->DriverData = BumpAllocate(sizeof(Task));
         New->WriteFunction = TaskWriteFunction;
@@ -53,6 +78,7 @@ static void SchedulerCreateProc(TaskRegisters InitialState)
         ((Task *)New->DriverData)->Registers = InitialState;
         ((Task *)New->DriverData)->ProgramIdentifier = ProgramIdentifier++;
         RegisterChildVNode(Proc, New);
+        return New;
 }
 
 void SchedulerInitialise(void)
@@ -60,11 +86,6 @@ void SchedulerInitialise(void)
         TaskRegisters InitialState;
         memset(&InitialState, 0, sizeof(InitialState));
         SchedulerCreateProcDir();
-
-        // kernel proc
-        SchedulerCreateProc(InitialState);
-        
-        // test
-        for (int i = 0; i < 32; ++i)
-                SchedulerCreateProc(InitialState);
+        CurrentProc = SchedulerCreateProc(InitialState);
+        EnableNextProcess();
 }

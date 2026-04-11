@@ -17,6 +17,7 @@ void kmain(void)
         Trace(VFSCreateDevices());
         Trace(SchedulerInitialise());
         FileDescriptor File = open("/dev/tty0", 0);
+        ArchSti();
         write(File, ArchIdentify(), strnlen(ArchIdentify(), 64));
         write(File, Message, sizeof(Message));
         read(File, InputString, sizeof(InputString) - 1);

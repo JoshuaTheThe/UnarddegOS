@@ -15,4 +15,7 @@ typedef struct
 
 void SchedulerInitialise(void);
 
+extern VNode *CurrentProc;
+extern Task ScratchProc;
+
 #endif

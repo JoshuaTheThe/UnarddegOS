@@ -1,8 +1,19 @@
 
 #include <arch.h>
+#include <stdint.h>
 
-// Stub
-void ArchInitialise(void) {}
+extern void TrapVector(void);
+
+void InitTraps(void)
+{
+        uintptr_t tvec = (uintptr_t)TrapVector;
+        __asm volatile("csrw mtvec, %0" :: "r"(tvec));
+}
+
+void ArchInitialise(void)
+{
+        InitTraps();
+}
 
 char *ArchIdentify(void)
 {
@@ -12,10 +23,12 @@ char *ArchIdentify(void)
 
 void ArchCli(void)
 {
+        __asm volatile("csrc mie, %0" :: "r"(1 << 7));
         __asm volatile ("csrrci zero, mstatus, 0x8");
 }
 
 void ArchSti(void)
 {
+        __asm volatile("csrs mie, %0" :: "r"(1 << 7));
         __asm volatile ("csrrsi zero, mstatus, 0x8");
 }
