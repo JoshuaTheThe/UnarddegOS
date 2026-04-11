@@ -21,11 +21,15 @@ void CommitProcessLoad(void)
 
 void CommitNextProcess(void)
 {
-        CurrentProc = CurrentProc->Next;
-        if (CurrentProc == NULL)
+        if (CurrentProc == NULL || CurrentProc->Next == NULL)
         {
                 CurrentProc = Proc->FirstChild;
         }
+        else
+        {
+                CurrentProc = CurrentProc->Next;
+        }
+        SerialPrint("bruh");
         EnableNextProcess();
         CommitProcessLoad();
 }

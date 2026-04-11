@@ -51,7 +51,7 @@ NextProcess:
         csrr    t1, satp
         sd      t1, 66*8(t0)
 
-        # FPU SAVE - enable FS bits so fsd doesn't trap
+        # # FPU SAVE - enable FS bits so fsd doesn't trap
         li      t1, 0x6000
         csrs    mstatus, t1
         fsd     f0,  32*8(t0)
@@ -95,6 +95,9 @@ NextProcess:
         call    CommitNextProcess
         # STAGE FOUR - LOAD next task from ScratchProc
         la      t0, ScratchProc
+        ld      t1, 66*8(t0)
+        csrw    satp, t1
+        sfence.vma
         # Restore PC and mstatus into CSRs first
         ld      t1,  0*8(t0)
         csrw    mepc, t1
@@ -134,7 +137,6 @@ NextProcess:
         fld     f29, 61*8(t0)
         fld     f30, 62*8(t0)
         fld     f31, 63*8(t0)
-
         # GPR RESTORE - t0 (x5) absolutely last, it's our pointer
         ld      x1,  1*8(t0)
         ld      x2,  2*8(t0)
@@ -168,10 +170,7 @@ NextProcess:
         ld      x31, 31*8(t0)
         ld      t1, 64*8(t0)
         csrw    mstatus, t1
-        csrw    satp, t1
-        ld      t1, 66*8(t0)
-        ld      x5,  5*8(t0)
-        sfence.vma
+        ld      t0,  5*8(t0)
         mret                        # jumps to mepc, privilege from mstatus
 InterruptStack:
         .space 4096
