@@ -5,7 +5,7 @@
 #define CLINT_MTIMECMP  (*(volatile uint64_t*)(CLINT_BASE + 0x4000))
 #define CLINT_MTIME     (*(volatile uint64_t*)(CLINT_BASE + 0xBFF8))
 
-#define TIMER_INTERVAL  10000
+#define TIMER_INTERVAL  800000
 
 static void EnableNextProcess(void)
 {

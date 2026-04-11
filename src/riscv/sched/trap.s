@@ -3,11 +3,12 @@
         .global TrapVector
         .align 4
 TrapVector:
-        csrr    t0, mcause
-        li      t1, 0x8000000000000007
-        beq     t0, t1, .Ltimer
+        csrrci zero, mstatus, 0x8
+        csrw   mscratch, t0
+        csrr   t0, mcause
+        bltz   t0, NextProcess
+        csrr   t0, mscratch
+        csrrsi zero, mstatus, 0x8
         # Handle other traps here (syscalls, faults, etc.)
         # For now, just return
         mret
-.Ltimer:
-        jal NextProcess

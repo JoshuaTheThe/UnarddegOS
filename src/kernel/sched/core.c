@@ -26,7 +26,6 @@ void CommitNextProcess(void)
         {
                 CurrentProc = Proc->FirstChild;
         }
-
         EnableNextProcess();
         CommitProcessLoad();
 }

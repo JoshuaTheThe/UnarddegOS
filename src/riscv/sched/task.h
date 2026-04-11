@@ -5,7 +5,7 @@
 
 typedef struct
 {
-        uint64_t Registers[66]; // pc,x1.x31,f0.f31,mstatus,fcsr
+        uint64_t Registers[67]; // pc,x1.x31,f0.f31,mstatus,fcsr,satp
 } TaskRegisters;
 
 #endif

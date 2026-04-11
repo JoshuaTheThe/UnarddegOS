@@ -13,15 +13,15 @@ void kmain(void)
 {
         static char Message[] = " [Info] Found tty0 VNode Successfully\n";
         static char InputString[16];
-        Trace(ArchInitialise());
-        Trace(VFSCreateDevices());
-        Trace(SchedulerInitialise());
+        ArchInitialise();
+        VFSCreateDevices();
+        SchedulerInitialise();
         FileDescriptor File = open("/dev/tty0", 0);
         ArchSti();
         write(File, ArchIdentify(), strnlen(ArchIdentify(), 64));
         write(File, Message, sizeof(Message));
         read(File, InputString, sizeof(InputString) - 1);
-        Trace(VNListTree(RootVNode(), 1));
+        VNListTree(RootVNode(), 1);
         Panic(PANIC_TODO);
         while(1);
 }

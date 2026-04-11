@@ -6,9 +6,9 @@
         .extern ScratchProc
         .extern CommitProcessSave
         .extern CommitNextProcess
+        .extern InterruptStack
 NextProcess:
         # GPR SAVE
-        csrw    mscratch, t0
         la      t0, ScratchProc
         sd      x1,  1*8(t0)
         sd      x2,  2*8(t0)
@@ -48,6 +48,8 @@ NextProcess:
         sd      t1,  0*8(t0)        # slot 0 = PC
         csrr    t1, mstatus
         sd      t1, 64*8(t0)        # slot 64 = mstatus
+        csrr    t1, satp
+        sd      t1, 66*8(t0)
 
         # FPU SAVE - enable FS bits so fsd doesn't trap
         li      t1, 0x6000
@@ -86,6 +88,7 @@ NextProcess:
         fsd     f31, 63*8(t0)
         frcsr   t1
         sd      t1, 65*8(t0)        # slot 65 = fcsr
+        la      sp, InterruptStack
         # STAGE TWO - commit scratch -> CurrentProc
         call    CommitProcessSave 
         # STAGE THREE - advance CurrentProc = CurrentProc->next
@@ -95,8 +98,6 @@ NextProcess:
         # Restore PC and mstatus into CSRs first
         ld      t1,  0*8(t0)
         csrw    mepc, t1
-        ld      t1, 64*8(t0)
-        csrw    mstatus, t1
         # Restore fcsr
         ld      t1, 65*8(t0)
         fscsr   t1
@@ -165,7 +166,12 @@ NextProcess:
         ld      x29, 29*8(t0)
         ld      x30, 30*8(t0)
         ld      x31, 31*8(t0)
+        ld      t1, 64*8(t0)
+        csrw    mstatus, t1
+        csrw    satp, t1
+        ld      t1, 66*8(t0)
         ld      x5,  5*8(t0)
-
-        # STAGE FIVE - return to next task
+        sfence.vma
         mret                        # jumps to mepc, privilege from mstatus
+InterruptStack:
+        .space 4096
