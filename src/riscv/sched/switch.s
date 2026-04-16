@@ -88,7 +88,7 @@ NextProcess:
         fsd     f31, 63*8(t0)
         frcsr   t1
         sd      t1, 65*8(t0)        # slot 65 = fcsr
-        la      sp, InterruptStack
+        la      sp, InterruptStack+4096
         # STAGE TWO - commit scratch -> CurrentProc
         call    CommitProcessSave 
         # STAGE THREE - advance CurrentProc = CurrentProc->next

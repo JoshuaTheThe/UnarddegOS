@@ -29,7 +29,6 @@ void CommitNextProcess(void)
         {
                 CurrentProc = CurrentProc->Next;
         }
-        SerialPrint("bruh");
         EnableNextProcess();
         CommitProcessLoad();
 }
