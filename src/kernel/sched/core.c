@@ -30,7 +30,6 @@ void CommitNextProcess(void)
         {
                 CurrentProc = CurrentProc->Next;
         }
-        SerialPrint("A");
         EnableNextProcess();
         CommitProcessLoad();
 }
