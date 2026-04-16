@@ -3,6 +3,7 @@
 #include <vmem/bumpalloc.h>
 #include <panic.h>
 #include <string.h>
+#define __NEXT_PROC
 #include <sched/trap.h>
 
 VNode *CurrentProc = NULL, *Proc = NULL;
@@ -29,6 +30,7 @@ void CommitNextProcess(void)
         {
                 CurrentProc = CurrentProc->Next;
         }
+        SerialPrint("A");
         EnableNextProcess();
         CommitProcessLoad();
 }
@@ -70,14 +72,14 @@ static void SchedulerCreateProcDir(void)
 static VNode *SchedulerCreateProc(TaskRegisters InitialState)
 {
         static uint64_t ProgramIdentifier = 0;
-        Proc            = RootVNode()->RelativeFind(RootVNode(), ProcDir, sizeof(ProcDir) - 1);
-        VNode *New      = NewVNode(VFS_SYSTEM | VFS_READ | VFS_WRITE);
-        New->DriverData = BumpAllocate(sizeof(Task));
+        Proc               = RootVNode()->RelativeFind(RootVNode(), ProcDir, sizeof(ProcDir) - 1);
+        VNode *New         = NewVNode(VFS_SYSTEM | VFS_READ | VFS_WRITE);
+        New->DriverData    = BumpAllocate(sizeof(Task));
         New->WriteFunction = TaskWriteFunction;
         New->ReadFunction  = TaskReadFunction;
         New->Name.Name     = UlToString(ProgramIdentifier);
         New->Name.Length   = strnlen(New->Name.Name, 32);
-        ((Task *)New->DriverData)->Registers = InitialState;
+        memcpy(&((Task *)New->DriverData)->Registers, &InitialState, sizeof(InitialState));
         ((Task *)New->DriverData)->ProgramIdentifier = ProgramIdentifier++;
         RegisterChildVNode(Proc, New);
         return New;
