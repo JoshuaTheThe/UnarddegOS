@@ -15,13 +15,11 @@ modules: $(MODULE_BINS)
 
 $(MODULES_BIN_DIR)/%.ko: $(MODULES_BUILD_DIR)/%/main.o
 	@mkdir -p $(dir $@)
-	$(KLD) $(KLDFLAGS) -T $(MODULES_DIR)/module.ld -r -o $@ $<
-	@echo "  MODULE  $@"
+	$(KLD) $(KLDFLAGS) -r -o $@ $< 
 
 $(MODULES_BUILD_DIR)/%/main.o: $(MODULES_DIR)/%/main.c
 	@mkdir -p $(dir $@)
-	$(KCC) $(KCFLAGS) $(KCPPFLAGS) -fPIC -I src/kernel -I src/modules -c -o $@ $<
-	@echo "  CC      $@"
+	$(KCC) $(KCFLAGS) $(KCPPFLAGS) -fno-pic -fno-pie -I src/kernel -I src/modules -c -o $@ $< -mno-tls-direct-seg-refs -fno-tls-model -U__TLS__
 
 clean-modules:
 	rm -rf $(MODULES_BUILD_DIR) $(MODULES_BIN_DIR)

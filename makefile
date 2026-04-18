@@ -15,7 +15,7 @@ override ASFILES += $(shell find $(SRC)/$(ARCH) -type f -name '*.s' | sed 's|^$(
 override KCC := clang
 override KAS := clang
 override KLD := ld
-override KCFLAGS := -pipe -Wall -Wextra -c -g -fno-strict-aliasing -O0
+override KCFLAGS := -pipe -Wall -Wextra -c -fno-strict-aliasing -O0
 override KCFLAGS += 
 override ASFLAGS += 
 override KLDFLAGS :=
@@ -45,9 +45,7 @@ override ASFLAGS += \
 
 override KLDFLAGS += \
     -nostdlib \
-    -static \
     -z max-page-size=0x1000 \
-    -T $(ARCH_LINKER_SCRIPT) \
     $(ARCH_KLDFLAGS)
 
 override OUTPUT := $(OUTPUT)$(ARCH_OUTPUT_SUFFIX)
@@ -62,9 +60,15 @@ override HEADER_DEPS += $(addprefix obj/,$(CFILES:.C=.C.d))
 .PHONY: all
 all: bin/$(OUTPUT)
 
-bin/$(OUTPUT): $(OBJ)
+.PHONY: sym
+sym:
+	@bash "scripts/kernelsym.sh"
+	$(KCC) $(KCFLAGS) $(KCPPFLAGS) -c $(SRC)/symbols.c -o obj/symbols.c.o -I $(KERNEL) -I $(SRC)/$(ARCH)
+
+
+bin/$(OUTPUT): $(OBJ) sym
 	mkdir -p "$$(dirname $@)"
-	$(KLD) $(OBJ) $(KLDFLAGS) -o $@
+	$(KLD) $(OBJ) obj/symbols.c.o $(KLDFLAGS) -o $@ -T $(ARCH_LINKER_SCRIPT) 
 	@echo " [INFO] Built $(OUTPUT) for architecture $(ARCH)"
 
 -include $(HEADER_DEPS)

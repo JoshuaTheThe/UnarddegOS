@@ -8,6 +8,7 @@
 #include <vfs/vfd.h>
 #include <string.h>
 #include <sched/core.h>
+#include <module.h>
 
 void kmain(unsigned int a, unsigned int b)
 {
@@ -16,6 +17,7 @@ void kmain(unsigned int a, unsigned int b)
         ArchInitialise(a, b);
         VFSCreateDevices();
         SchedulerInitialise();
+        LoadModules(a, b);
         FileDescriptor File = open("/dev/tty0", 0);
         ArchSti();
         write(File, ArchIdentify(), strnlen(ArchIdentify(), 64));

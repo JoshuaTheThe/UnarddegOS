@@ -23,6 +23,7 @@ void TimerInit(uint32_t targetFreq)
 
 void ArchInitialise(unsigned int magic, unsigned int mb_info_addr)
 {
+        (void)mb_info_addr;
         if (magic != 0x36d76289)
         {
                 Panic(PANIC_INCORRECT_BOOTLOADER);
@@ -31,6 +32,11 @@ void ArchInitialise(unsigned int magic, unsigned int mb_info_addr)
         GdtInit();
         IdtInit();
         TimerInit(100);
+}
+
+void LoadModules(unsigned int magic, unsigned int mb_info_addr)
+{
+        (void)magic;
         unsigned int offset = 8;
         struct multiboot_tag *tag;
         while (1)
