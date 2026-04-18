@@ -60,14 +60,13 @@ override HEADER_DEPS += $(addprefix obj/,$(CFILES:.C=.C.d))
 .PHONY: all
 all: bin/$(OUTPUT)
 
-.PHONY: sym
-sym:
+bin/$(OUTPUT): $(OBJ)
+	mkdir -p "$$(dirname $@)"
 	@bash "scripts/kernelsym.sh"
 	$(KCC) $(KCFLAGS) $(KCPPFLAGS) -c $(SRC)/symbols.c -o obj/symbols.c.o -I $(KERNEL) -I $(SRC)/$(ARCH)
-
-
-bin/$(OUTPUT): $(OBJ) sym
-	mkdir -p "$$(dirname $@)"
+	$(KLD) $(OBJ) obj/symbols.c.o $(KLDFLAGS) -o $@ -T $(ARCH_LINKER_SCRIPT) 
+	@bash "scripts/kernelsym.sh"
+	$(KCC) $(KCFLAGS) $(KCPPFLAGS) -c $(SRC)/symbols.c -o obj/symbols.c.o -I $(KERNEL) -I $(SRC)/$(ARCH)
 	$(KLD) $(OBJ) obj/symbols.c.o $(KLDFLAGS) -o $@ -T $(ARCH_LINKER_SCRIPT) 
 	@echo " [INFO] Built $(OUTPUT) for architecture $(ARCH)"
 
