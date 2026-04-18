@@ -9,11 +9,11 @@
 #include <string.h>
 #include <sched/core.h>
 
-void kmain(void)
+void kmain(unsigned int a, unsigned int b)
 {
         static char Message[] = " [Info] Found tty0 VNode Successfully\n";
         static char InputString[16];
-        ArchInitialise();
+        ArchInitialise(a, b);
         VFSCreateDevices();
         SchedulerInitialise();
         FileDescriptor File = open("/dev/tty0", 0);

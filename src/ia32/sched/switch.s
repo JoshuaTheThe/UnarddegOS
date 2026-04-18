@@ -18,7 +18,6 @@ NextProcess:
         popl    9*4(%edi)
         popl    15*4(%edi)
         movl    %esp, (4*4+ScratchProc)
-        movl    $InterruptStackTop, %esp
 
         # --- SEGMENT REGISTERS ---
         movw    %ds, %ax
@@ -38,6 +37,8 @@ NextProcess:
 	movw    %ax, %ss
 	movw    %ax, %fs
 	movw    %ax, %gs
+        movl    $(InterruptStackTop-16), %esp
+        xorl    %ebp,%ebp
 
         # --- SWITCH TO INTERRUPT STACK AND COMMIT ---
         call    CommitProcessSave

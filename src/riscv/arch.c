@@ -10,8 +10,10 @@ void InitTraps(void)
         __asm volatile("csrw mtvec, %0" :: "r"(tvec));
 }
 
-void ArchInitialise(void)
+void ArchInitialise(unsigned int a, unsigned int b)
 {
+        (void)a;
+        (void)b;
         InitTraps();
 }
 

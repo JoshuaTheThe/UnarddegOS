@@ -30,6 +30,7 @@ typedef enum
         PANIC_SEGMENTATION_FAULT,
         PANIC_DOUBLE_OPEN,
         PANIC_FD_NOT_FOUND,
+        PANIC_INCORRECT_BOOTLOADER,
 } PanicCode;
 
 typedef struct

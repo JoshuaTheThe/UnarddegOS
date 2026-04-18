@@ -4,6 +4,8 @@
 #include <io.h>
 #include <gdt.h>
 #include <idt.h>
+#include <panic.h>
+#include <_arch.h>
 
 #define PIT_FREQUENCY 1193180
 #define PIT_CHANNEL0 0x40
@@ -18,11 +20,26 @@ void TimerInit(uint32_t targetFreq)
         outb(PIT_CHANNEL0, (divisor >> 8) & 0xFF);
 }
 
-void ArchInitialise(void)
+void ArchInitialise(unsigned int a, unsigned int b)
 {
+        if (a != 0x36d76289)
+        {
+                Panic(PANIC_INCORRECT_BOOTLOADER);
+        }
+        (void)a;
+        (void)b;
         GdtInit();
         IdtInit();
         TimerInit(100);
+
+        unsigned int offset = 8;
+        while (1)
+        {
+                struct multiboot_tag *tag = (struct multiboot_tag *)(b + offset);
+                if (tag->type == 0)
+                        break; // End tag
+                offset += (tag->size + 7) & ~7; // Align
+        }
 }
 
 char *ArchIdentify(void)
@@ -33,10 +50,10 @@ char *ArchIdentify(void)
 
 void ArchCli(void)
 {
-        __asm volatile ("cli");
+        __asm volatile("cli");
 }
 
 void ArchSti(void)
 {
-        __asm volatile ("sti");
+        __asm volatile("sti");
 }

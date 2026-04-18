@@ -36,8 +36,10 @@ void InitTraps(void)
         );
 }
 
-void ArchInitialise(void)
+void ArchInitialise(unsigned int a, unsigned int b)
 {
+        (void)a;
+        (void)b;
         InitTraps();
         InitTimer();
 }
