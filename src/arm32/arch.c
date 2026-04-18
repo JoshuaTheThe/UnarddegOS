@@ -44,6 +44,9 @@ void ArchInitialise(unsigned int a, unsigned int b)
         InitTimer();
 }
 
+void LoadModules(unsigned int a, unsigned int b)
+{(void)a; (void)b;}
+
 char *ArchIdentify(void)
 {
         static char *Architecture = " [Info] ISA: Arm32,Arm/v7, CPU: cortex-a15\n";

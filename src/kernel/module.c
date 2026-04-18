@@ -17,7 +17,7 @@ static void *FindSymbol(struct loaded_module *mod, const char *name)
 
                         if (section_idx == SHN_ABS)
                         {
-                                result = (void *)mod->symtab[i].st_value;
+                                result = (void *)(uintptr_t)mod->symtab[i].st_value;
                         }
                         else if (section_idx == SHN_COMMON)
                         {
@@ -72,11 +72,11 @@ static int RelocateModule(struct loaded_module *mod, struct elf_header *elf)
                         {
                                 int type = ELF32_R_TYPE(rel[r].r_info);
                                 int sym_idx = ELF32_R_SYM(rel[r].r_info);
-                                uint32_t *patch_addr = (uint32_t *)(target_base + rel[r].r_offset);
-                                uint32_t sym_addr = 0;
+                                uintptr_t *patch_addr = (uintptr_t *)(target_base + rel[r].r_offset);
+                                uintptr_t sym_addr = 0;
                                 if (type == R_386_RELATIVE && sym_idx == 0)
                                 {
-                                        *patch_addr = (uint32_t)mod->base + rel[r].r_addend;
+                                        *patch_addr = (uintptr_t)mod->base + rel[r].r_addend;
                                         continue;
                                 }
                                 
@@ -90,7 +90,7 @@ static int RelocateModule(struct loaded_module *mod, struct elf_header *elf)
                                                 if (shdr[sym->st_shndx].sh_flags & SHF_ALLOC)
                                                 {
                                                         unsigned int section_offset = shdr[sym->st_shndx].sh_offset;
-                                                        sym_addr = (uint32_t)mod->base + section_offset + sym->st_value;
+                                                        sym_addr = (uintptr_t)mod->base + section_offset + sym->st_value;
                                                 }
                                                 else
                                                 {
@@ -99,7 +99,7 @@ static int RelocateModule(struct loaded_module *mod, struct elf_header *elf)
                                         }
                                         else if (sym->st_shndx == SHN_UNDEF && sym_name[0] != '\0')
                                         {
-                                                sym_addr = (uint32_t)FindKernelSymbol(sym_name);
+                                                sym_addr = (uintptr_t)FindKernelSymbol(sym_name);
                                                 if (sym_addr == 0)
                                                 {
                                                         SerialPrint(" [Error] Unresolved symbol: %s\r\n", sym_name);
@@ -119,7 +119,7 @@ static int RelocateModule(struct loaded_module *mod, struct elf_header *elf)
                                         break;
                                         
                                 case R_386_PC32:  // S + A - P
-                                        *patch_addr = sym_addr + rel[r].r_addend - (uint32_t)patch_addr;
+                                        *patch_addr = sym_addr + rel[r].r_addend - (uintptr_t)patch_addr;
                                         break;
                                         
                                 case R_386_GOT32:
@@ -150,9 +150,9 @@ static int RelocateModule(struct loaded_module *mod, struct elf_header *elf)
                         {
                                 int type = ELF32_R_TYPE(rel[r].r_info);
                                 int sym_idx = ELF32_R_SYM(rel[r].r_info);
-                                uint32_t *patch_addr = (uint32_t *)(target_base + rel[r].r_offset);
-                                uint32_t sym_addr = 0;
-                                uint32_t addend = *patch_addr;  // For REL, addend is at patch location
+                                uintptr_t *patch_addr = (uintptr_t *)(target_base + rel[r].r_offset);
+                                uintptr_t sym_addr = 0;
+                                uintptr_t addend = *patch_addr;  // For REL, addend is at patch location
                                 
                                 {
                                         struct elf_symbol *sym = &mod->symtab[sym_idx];
@@ -163,7 +163,7 @@ static int RelocateModule(struct loaded_module *mod, struct elf_header *elf)
                                                 if (shdr[sym->st_shndx].sh_flags & SHF_ALLOC)
                                                 {
                                                         unsigned int section_offset = shdr[sym->st_shndx].sh_offset;
-                                                        sym_addr = (uint32_t)mod->base + section_offset + sym->st_value;
+                                                        sym_addr = (uintptr_t)mod->base + section_offset + sym->st_value;
                                                 }
                                                 else
                                                 {
@@ -172,7 +172,7 @@ static int RelocateModule(struct loaded_module *mod, struct elf_header *elf)
                                         }
                                         else if (sym->st_shndx == SHN_UNDEF && sym_name[0] != '\0')
                                         {
-                                                sym_addr = (uint32_t)FindKernelSymbol(sym_name);
+                                                sym_addr = (uintptr_t)FindKernelSymbol(sym_name);
                                                 if (sym_addr == 0)
                                                 {
                                                         SerialPrint(" [Error] Unresolved symbol: %s\r\n", sym_name);
@@ -188,7 +188,7 @@ static int RelocateModule(struct loaded_module *mod, struct elf_header *elf)
                                         break;
                                         
                                 case R_386_PC32:
-                                        *patch_addr = sym_addr + addend - (uint32_t)patch_addr;
+                                        *patch_addr = sym_addr + addend - (uintptr_t)patch_addr;
                                         break;
                                         
                                 case R_386_GLOB_DAT:
@@ -224,8 +224,7 @@ static void CallConstructors(struct loaded_module *mod)
                         {
                                 if (init_funcs[c])
                                 {
-                                        SerialPrint(" [Info] Calling constructor %d at 0x%x\r\n", c,
-                                                    (unsigned int)init_funcs[c]);
+                                        SerialPrint(" [Info] Calling constructor %d at 0x%x\r\n", c, init_funcs[c]);
                                         init_funcs[c]();
                                 }
                         }
@@ -266,7 +265,7 @@ void LoadModule(void *addr, size_t size, const char *name)
                 int result = 0;
                 if (init_func)
                 {
-                        SerialPrint(" [Info] Calling Init at 0x%x\r\n", (unsigned int)init_func);
+                        SerialPrint(" [Info] Calling Init at 0x%x\r\n", init_func);
                         result = init_func(FindKernelSymbol);
                         SerialPrint(" [Info] Init returned %d\r\n", result);
                 }

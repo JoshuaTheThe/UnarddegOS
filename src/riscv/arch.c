@@ -17,6 +17,9 @@ void ArchInitialise(unsigned int a, unsigned int b)
         InitTraps();
 }
 
+void LoadModules(unsigned int a, unsigned int b)
+{(void)a; (void)b;}
+
 char *ArchIdentify(void)
 {
         static char *Architecture = " [Info] ISA: RISCV, CPU: Generic\n";
