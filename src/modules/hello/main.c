@@ -3,5 +3,5 @@
 int Init(void)
 {
         SerialPrint(" [Hello] Hello, World!\r\n");
-        return 100;
+        return 0;
 }
