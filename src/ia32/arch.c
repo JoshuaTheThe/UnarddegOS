@@ -6,6 +6,7 @@
 #include <idt.h>
 #include <panic.h>
 #include <_arch.h>
+#include <module.h>
 
 #define PIT_FREQUENCY 1193180
 #define PIT_CHANNEL0 0x40
@@ -20,25 +21,43 @@ void TimerInit(uint32_t targetFreq)
         outb(PIT_CHANNEL0, (divisor >> 8) & 0xFF);
 }
 
-void ArchInitialise(unsigned int a, unsigned int b)
+void ArchInitialise(unsigned int magic, unsigned int mb_info_addr)
 {
-        if (a != 0x36d76289)
+        if (magic != 0x36d76289)
         {
                 Panic(PANIC_INCORRECT_BOOTLOADER);
         }
-        (void)a;
-        (void)b;
+
         GdtInit();
         IdtInit();
         TimerInit(100);
-
         unsigned int offset = 8;
+        struct multiboot_tag *tag;
         while (1)
         {
-                struct multiboot_tag *tag = (struct multiboot_tag *)(b + offset);
+                tag = (struct multiboot_tag *)(mb_info_addr + offset);
+
                 if (tag->type == 0)
-                        break; // End tag
-                offset += (tag->size + 7) & ~7; // Align
+                        break;
+                if (tag->type == 3)
+                {
+                        struct multiboot_tag_module *mod = (struct multiboot_tag_module *)tag;
+                        SerialPrint(" [Info] Module at 0x%x - 0x%x: %s\r\n",
+                                    mod->mod_start,
+                                    mod->mod_end,
+                                    mod->cmdline);
+
+                        LoadModule((void*)mod->mod_start,
+                                   mod->mod_end - mod->mod_start,
+                                   mod->cmdline);
+                }
+                else
+                {
+                        SerialPrint(" [Info] Found tag type %d, size %d\r\n",
+                                    tag->type, tag->size);
+                }
+
+                offset += (tag->size + 7) & ~7;
         }
 }
 

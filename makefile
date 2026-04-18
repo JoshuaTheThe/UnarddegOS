@@ -1,7 +1,7 @@
 
 override MAKEFLAGS += -rR
 
-ARCH := riscv
+ARCH := ia32
 override BIN := bin
 override SRC := src
 override KERNEL := $(SRC)/kernel
@@ -83,8 +83,10 @@ obj/%.s.o: $(SRC)/%.s
 
 include $(SRC)/$(ARCH)/post.mk
 
+include modules.mk
+
 .PHONY: clean
-clean:
+clean: clean-modules
 	@rm -rf bin obj
 
 .PHONY: run
