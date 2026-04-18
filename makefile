@@ -60,7 +60,7 @@ override HEADER_DEPS += $(addprefix obj/,$(CFILES:.C=.C.d))
 .PHONY: all
 all: bin/$(OUTPUT)
 
-bin/$(OUTPUT): $(OBJ)
+bin/$(OUTPUT): $(OBJ) modules
 	mkdir -p "$$(dirname $@)"
 	@bash "scripts/kernelsym.sh"
 	$(KCC) $(KCFLAGS) $(KCPPFLAGS) -c $(SRC)/symbols.c -o obj/symbols.c.o -I $(KERNEL) -I $(SRC)/$(ARCH)
