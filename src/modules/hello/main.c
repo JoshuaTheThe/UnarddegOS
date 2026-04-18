@@ -1,8 +1,7 @@
 #include <drivers/serial.h>
 
-int Init(void *(*FindKernelSymbol)(const char *name))
+int Init(void)
 {
-        (void)FindKernelSymbol;
         SerialPrint(" [Hello] Hello, World! %s\r\n");
         return 100;
 }
