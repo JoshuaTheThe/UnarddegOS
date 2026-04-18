@@ -1,7 +1,7 @@
 #!/bin/bash
 clear
 mkdir bin/isodir
-if grub-file --is-x86-multiboot bin/unarddegos_ia32.o; then
+if grub-file --is-x86-multiboot2 bin/unarddegos_ia32.o; then
         echo the file is multiboot
         mkdir -p bin/isodir/boot/grub
         cp bin/unarddegos_ia32.o bin/isodir/boot

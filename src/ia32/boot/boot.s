@@ -1,26 +1,38 @@
         .section .multiboot
-        .align 16
+        .align 8
 multiboot_header:
-        .long   0x1BADB002               /* Magic */
-        .long   0x00000007               /* Flags: PAGE_ALIGN + MEMORY_INFO + VIDEO_MODE */
-        .long   -(0x1BADB002 + 0x07)     /* Checksum */
-        .long   0, 0, 0, 0, 0            /* Unused fields */
-        .long   0                        /* Mode type: linear graphics */
-        .long   800                      /* Width */
-        .long   600                      /* Height */
-        .long   32                       /* Depth */
-
+        /* Header magic */
+        .long 0xE85250D6
+        /* Architecture: i386 (0) */
+        .long 0
+        /* Header length */
+        .long (multiboot_header_end - multiboot_header)
+        /* Checksum */
+        .long 0x100000000 - (0xE85250D6 + 0 + (multiboot_header_end - multiboot_header))
+        
+        /* REQUIRED: Information request tag (tells GRUB what to give you) */
+        .align 8
+        .word 1
+        .word 0
+        .long 8
+        .long 0    /* Request basic info */
+        
+        /* REQUIRED: End tag */
+        .align 8
+        .word 0
+        .word 0
+        .long 8
+multiboot_header_end:
         .section .text
         .global _start
         .type _start, @function
-_start:
-        mov $stack_top, %esp
+_start: mov $stack_top, %esp
         xor %ebp, %ebp
         push %ebx
         push %eax
         call kmain
-        cli
-        1:  hlt
+1:      cli
+        hlt
         jmp 1b
         .size _start, . - _start
         .section .bss
