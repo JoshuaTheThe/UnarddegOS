@@ -2,6 +2,6 @@
 
 int Init(void)
 {
-        SerialPrint(" [Hello] Hello, World! %s\r\n");
+        SerialPrint(" [Hello] Hello, World!\r\n");
         return 100;
 }
