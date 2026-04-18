@@ -19,15 +19,12 @@ static void *FindSymbol(struct loaded_module *mod, const char *name)
                         {
                                 unsigned int section_offset = shdr[section_idx].sh_offset;
                                 result = (void *)((char *)mod->base + section_offset + mod->symtab[i].st_value);
-                                SerialPrint(" [Debug] Symbol in section %d (offset 0x%x + 0x%x)\r\n",
-                                           section_idx, section_offset, mod->symtab[i].st_value);
                         }
                         else
                         {
                                 result = (void *)((char *)mod->base + mod->symtab[i].st_value);
                         }
                         
-                        SerialPrint(" [Info] Found %s at address 0x%x\r\n", name, (unsigned int)result);
                         return result;
                 }
         }
@@ -155,7 +152,6 @@ void LoadModule(void *addr, size_t size, const char *name)
         if (magic[0] == 0x7F && magic[1] == 'E' &&
             magic[2] == 'L' && magic[3] == 'F')
         {
-                SerialPrint(" [Info] ELF module detected\r\n");
                 struct elf_header *elf = (struct elf_header *)addr;
                 if (elf->type != 1)
                 {
@@ -163,7 +159,6 @@ void LoadModule(void *addr, size_t size, const char *name)
                         return;
                 }
 
-                SerialPrint(" [Info] Relocatable ELF module (type=ET_REL)\r\n");
                 struct loaded_module mod;
                 mod.base = addr;
                 mod.size = size;
@@ -176,7 +171,6 @@ void LoadModule(void *addr, size_t size, const char *name)
                         return;
                 }
 
-                SerialPrint(" [Info] Relocations applied successfully\r\n");
                 void (*init_func)(void) = FindSymbol(&mod, "Init");
                 if (init_func)
                 {

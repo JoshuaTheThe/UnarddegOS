@@ -42,19 +42,9 @@ void ArchInitialise(unsigned int magic, unsigned int mb_info_addr)
                 if (tag->type == 3)
                 {
                         struct multiboot_tag_module *mod = (struct multiboot_tag_module *)tag;
-                        SerialPrint(" [Info] Module at 0x%x - 0x%x: %s\r\n",
-                                    mod->mod_start,
-                                    mod->mod_end,
-                                    mod->cmdline);
-
                         LoadModule((void*)mod->mod_start,
                                    mod->mod_end - mod->mod_start,
                                    mod->cmdline);
-                }
-                else
-                {
-                        SerialPrint(" [Info] Found tag type %d, size %d\r\n",
-                                    tag->type, tag->size);
                 }
 
                 offset += (tag->size + 7) & ~7;
