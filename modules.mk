@@ -4,7 +4,8 @@ MODULES_BUILD_DIR := obj/modules
 MODULES_BIN_DIR := bin/modules
 
 MODULES := $(wildcard $(MODULES_DIR)/*/)
-MODULE_NAMES := $(notdir $(patsubst %/,%,$(MODULES)))
+# MODULE_NAMES := $(notdir $(patsubst %/,%,$(MODULES)))
+MODULE_NAMES += hello
 
 MODULE_OBJS := $(foreach m,$(MODULE_NAMES),$(MODULES_BUILD_DIR)/$(m)/main.o)
 MODULE_BINS := $(foreach m,$(MODULE_NAMES),$(MODULES_BIN_DIR)/$(m).ko)
