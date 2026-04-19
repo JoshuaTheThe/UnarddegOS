@@ -17,9 +17,9 @@ void kmain(unsigned int a, unsigned int b)
         ArchInitialise(a, b);
         VFSCreateDevices();
         SchedulerInitialise();
+        ArchSti();
         LoadModules(a, b);
         FileDescriptor File = open("/dev/tty0", 0);
-        ArchSti();
         write(File, ArchIdentify(), strnlen(ArchIdentify(), 64));
         write(File, Message, sizeof(Message));
         read(File, InputString, sizeof(InputString) - 1);

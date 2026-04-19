@@ -13,6 +13,14 @@
 #define PIT_COMMAND 0x43
 #define PIT_STATUS 0x61
 
+void Delay(unsigned long ticks)
+{
+        extern uint64_t Ticks;
+        uint32_t start = Ticks;
+        while ((Ticks - start) < ticks)
+        { __asm volatile("pause"); }
+}
+
 void TimerInit(uint32_t targetFreq)
 {
         uint32_t divisor = 1193180 / targetFreq;

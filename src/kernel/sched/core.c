@@ -9,6 +9,7 @@
 VNode *CurrentProc = NULL, *Proc = NULL;
 Task ScratchProc = {0};
 static const char ProcDir[] = "proc";
+uint64_t Ticks = 0;
 
 void CommitProcessSave(void)
 {
@@ -22,6 +23,7 @@ void CommitProcessLoad(void)
 
 void CommitNextProcess(void)
 {
+        Ticks += 1;
         if (CurrentProc == NULL || CurrentProc->Next == NULL)
         {
                 CurrentProc = Proc->FirstChild;

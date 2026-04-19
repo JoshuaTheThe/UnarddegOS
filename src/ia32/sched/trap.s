@@ -3,7 +3,6 @@
         .global IdtDefault
         .extern NextProcess
 IdtTimer:
+IdtDefault:
         cli
         jmp NextProcess
-IdtDefault:
-        iret

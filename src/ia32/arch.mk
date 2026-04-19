@@ -8,4 +8,4 @@ override ARCH_RUN_SCRIPT := src/ia32/run.sh
 
 override KCC = clang
 
-MODULE_NAMES += pci
+MODULE_NAMES += pci ide

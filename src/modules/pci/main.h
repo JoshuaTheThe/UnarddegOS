@@ -32,12 +32,36 @@ typedef struct
         uint32_t Count;
 } PCI;
 
+#ifdef FUNCTION
+
 size_t PCIGetDevices(PCI *Pci, PCIDEV *destination, size_t start, size_t end);
 const char *PCIClassToString(PCI *Pci, uint8_t class_id, uint8_t subclass_id);
 void PCIEnumerateDevices(PCI *Pci, void (*on_device_found)(PCI *Pci, PCIDEV *));
 void PCIDisplayDeviceInfo(PCI *Pci, PCIDEV *dev);
 void PCIRegister(PCI *Pci, PCIDEV *dev);
 PCIDEV *PCIFindOfType(PCI *Pci, uint8_t class_id, uint8_t subclass_id);
-PCIDEV *PCIGetOriginalDevice(PCI *Pci, size_t Index);
+
+#else
+
+__attribute__((__used__))
+static size_t PCIGetPci(PCI *Pci, PCIDEV *destination, size_t start, size_t end)
+{
+        size_t count = 0;
+        for (size_t i = start; i <= end && i < Pci->Count; ++i)
+        {
+                destination[count] = Pci->Dev[i];
+                count++;
+        }
+        return count;
+}
+
+static PCIDEV *PCIGetOriginalDevice(PCI *Pci, size_t Index)
+{
+        if (Index >= MAX_DEVICES)
+                return NULL;
+        return &Pci->Dev[Index];
+}
+
+#endif
 
 #endif // PCI_H

@@ -6,5 +6,6 @@ void ArchInitialise(unsigned int a, unsigned int b); // init for that architectu
 char *ArchIdentify(void); // return a static string of information
 void ArchCli(void); // disable interrupts, or any other thing that may cause CPU state to change other than reset
 void ArchSti(void); // enable interrupts, or any other thing that may cause CPU state to change
+void Delay(unsigned long ticks);
 
 #endif

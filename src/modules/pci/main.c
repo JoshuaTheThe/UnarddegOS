@@ -1,3 +1,4 @@
+#define FUNCTION
 #include <PCI/main.h>
 #include <vfs/vnode.h>
 #include <drivers/serial.h>
@@ -5,23 +6,6 @@
 #include <panic.h>
 #include <string.h>
 
-size_t PCIGetPci(PCI *Pci, PCIDEV *destination, size_t start, size_t end)
-{
-        size_t count = 0;
-        for (size_t i = start; i <= end && i < Pci->Count; ++i)
-        {
-                destination[count] = Pci->Dev[i];
-                count++;
-        }
-        return count;
-}
-
-PCIDEV *PCIGetOriginalDevice(PCI *Pci, size_t Index)
-{
-        if (Index >= MAX_DEVICES)
-                return NULL;
-        return &Pci->Dev[Index];
-}
 
 const char *PCIClassToString(PCI *Pci, uint8_t class_id, uint8_t subclass_id)
 {
@@ -295,7 +279,7 @@ int Init(void)
         VNode *DevFile = RootVNode()->RelativeFind(RootVNode(), "dev", 3);
         if (!DevFile)
                 return -1;
-        VNode *PciFile = NewVNode(0); // no flags
+        VNode *PciFile = NewVNode(VFS_READ | VFS_WRITE);
         PciFile->Name.Name     = "pci";
         PciFile->Name.Length   = 3;
         PciFile->DriverData    = Pci;
