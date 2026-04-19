@@ -111,7 +111,6 @@ static int RelocateModule(struct loaded_module *mod, struct elf_header *elf)
                                                 sym_addr = sym->st_value;
                                         }
                                 }
-                                
                                 switch (type)
                                 {
                                 case R_386_32:  // S + A
@@ -119,11 +118,11 @@ static int RelocateModule(struct loaded_module *mod, struct elf_header *elf)
                                         break;
                                         
                                 case R_386_PC32:  // S + A - P
+                                case R_386_PLT32:
                                         *patch_addr = sym_addr + rel[r].r_addend - (uintptr_t)patch_addr;
                                         break;
                                         
                                 case R_386_GOT32:
-                                case R_386_PLT32:
                                 case R_386_COPY:
                                 case R_386_GLOB_DAT:
                                 case R_386_JUMP_SLOT:
@@ -188,6 +187,7 @@ static int RelocateModule(struct loaded_module *mod, struct elf_header *elf)
                                         break;
                                         
                                 case R_386_PC32:
+                                case R_386_PLT32:
                                         *patch_addr = sym_addr + addend - (uintptr_t)patch_addr;
                                         break;
                                         
