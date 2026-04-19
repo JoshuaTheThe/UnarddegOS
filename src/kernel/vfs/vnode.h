@@ -9,6 +9,7 @@
 #define VFS_LINK    (0x10)
 #define VFS_MOUNTED (0x20) // treat the linked file as a device // directory
 #define VFS_OPENED  (0x40)
+#define VFS_ONDISK  (0x80) // children are on disk for the given file system, loaded via ConstructChildren
 
 struct VNode;
 
