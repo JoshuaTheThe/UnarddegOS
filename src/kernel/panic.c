@@ -31,6 +31,9 @@ _Noreturn void PanicImpl(const char *const File, long Line, PanicCode Code, cons
         ArchCli(); // disable interrupts and say, context switching timers for given architecture
         SerialPrint("\r\n -- KERNEL PANIC -- \r\n");
         SerialPrint("Kernel Panic Function %x (%s) was raised\r\n", Code, CodeAsStr);
+        #ifdef HAS_TEMPERATURE
+        SerialPrint("Temperature x1000: %d\r\n", ArchGetTemperatureMC());
+        #endif
         if (File)
                 SerialPrint("Source Location: %s:%d\r\n", File, Line);
         SerialPrint("Trace Dump:\r\n");

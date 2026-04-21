@@ -1,6 +1,7 @@
 #ifndef _ARCH_H
 #define _ARCH_H
 
+#define HAS_TEMPERATURE
 #include <stdint.h>
 
 struct multiboot_tag
