@@ -1,5 +1,7 @@
 #include <drivers/serial.h>
 #define VGA_TEXT_BUFFER (0xB8000)
+#define KEYBOARD_STATUS_PORT 0x64
+#define KEYBOARD_DATA_PORT   0x60
 
 int X = 0, Y = 0, W = 80, H = 25;
 
@@ -23,6 +25,59 @@ void Scroll(void)
                 VGA[i + 1] = 0x1e;
         }
         Y = H - 1;
+}
+
+const uint16_t keyboard_map[256] =
+{
+	0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b', '\t',
+	'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 2, 'a', 's',
+	'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 0, '#', 'z', 'x', 'c', 'v',
+	'b', 'n', 'm', ',', '.', '/', 1, '*', 1, ' ',
+	2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '\a', '\v', '\r',
+	'k', 'K', '-', 'h', '5', 'l', '+', 26, 'j', 'J', 25, 127, '\n',
+	1, '\\', 0, 0
+};
+
+const uint16_t keyboard_map_shifted[256] =
+{
+	0, 27, '!', '"', '\\', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b', '\t',
+	'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', 2, 'A', 'S',
+	'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '@', '`', 0, '#', 'Z', 'X', 'C', 'V',
+	'B', 'N', 'M', '<', '>', '?', 1, '*', 1, ' ',
+	2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '/', '7',
+	'8', '9', '-', '4', '5', '6', '+', '1', '2', '3', '0', '.', '\n',
+	1, '\\', 0, 0
+};
+
+bool PS2CanRead(void)
+{
+	char status;
+        status = inb(KEYBOARD_STATUS_PORT);
+        return (status & 0x01);
+}
+
+uint16_t PS2Getch(void)
+{
+	char status;
+	do
+        {
+        	status = inb(KEYBOARD_STATUS_PORT);
+	} while ((status & 0x01) == 0);
+
+	unsigned char scancode = inb(KEYBOARD_DATA_PORT);
+	static int shift_pressed = 0;
+	if (scancode == 0x2A)
+        {
+		shift_pressed = 1;
+		return 0;
+	}
+        else if (scancode == 0xAA)
+        {
+		shift_pressed = 0;
+		return 0;
+	}
+
+	return (scancode & 0x80) ? 0 : (shift_pressed ? keyboard_map_shifted[scancode] : keyboard_map[scancode]);
 }
 
 void VGAPutCharacter(char Chr)
@@ -73,10 +128,12 @@ void SerialWaitForTransmit(void)
                 ;
 }
 
+bool type=false;
 void SerialWaitForInput(void)
 {
-        while (!SerialCanRead())
+        while (!SerialCanRead() && !PS2CanRead())
                 ;
+        type=SerialCanRead();
 }
 
 void SerialPut(char c)
@@ -94,5 +151,8 @@ bool SerialCanRead(void)
 char SerialRead(void)
 {
         SerialWaitForInput();
-        return inb(SERIAL_PORT);
+        if (type)
+                return inb(SERIAL_PORT);
+        else
+                return PS2Getch();
 }
