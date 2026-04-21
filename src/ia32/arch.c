@@ -122,6 +122,12 @@ char *ArchIdentify(void)
         return Architecture;
 }
 
+void ArchPause(void)
+{
+        __asm volatile("pause");
+        __asm volatile("hlt");
+}
+
 void ArchCli(void)
 {
         __asm volatile("cli");

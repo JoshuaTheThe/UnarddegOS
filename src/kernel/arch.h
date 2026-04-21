@@ -10,5 +10,6 @@ void ArchCli(void); // disable interrupts, or any other thing that may cause CPU
 void ArchSti(void); // enable interrupts, or any other thing that may cause CPU state to change
 void Delay(unsigned long ticks);
 int ArchGetTemperatureMC(void);
+void ArchPause(void);
 
 #endif

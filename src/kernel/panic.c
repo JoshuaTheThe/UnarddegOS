@@ -49,5 +49,5 @@ _Noreturn void PanicImpl(const char *const File, long Line, PanicCode Code, cons
                             FunctionTrace[Depth - 1].FunctionName);
         }
         while (true)
-                ;
+                ArchPause();
 }

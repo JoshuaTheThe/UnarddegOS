@@ -1,4 +1,5 @@
 #include <drivers/serial.h>
+#include <arch.h>
 #define VGA_TEXT_BUFFER (0xB8000)
 #define KEYBOARD_STATUS_PORT 0x64
 #define KEYBOARD_DATA_PORT   0x60
@@ -69,15 +70,19 @@ uint16_t PS2Getch(void)
 	if (scancode == 0x2A)
         {
 		shift_pressed = 1;
-		return 0;
+		return PS2Getch();
 	}
         else if (scancode == 0xAA)
         {
 		shift_pressed = 0;
-		return 0;
+		return PS2Getch();
 	}
+        else if (scancode & 0x80)
+        {
+                return PS2Getch();
+        }
 
-	return (scancode & 0x80) ? 0 : (shift_pressed ? keyboard_map_shifted[scancode] : keyboard_map[scancode]);
+	return (shift_pressed ? keyboard_map_shifted[scancode] : keyboard_map[scancode]);
 }
 
 void VGAPutCharacter(char Chr)
