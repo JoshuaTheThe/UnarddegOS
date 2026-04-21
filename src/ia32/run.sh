@@ -41,7 +41,7 @@ if grub-file --is-x86-multiboot2 bin/unarddegos_ia32.o; then
     sudo losetup -d ${LOOP}
     
     # Run QEMU with HDD
-    qemu-system-x86_64 -debugcon stdio -hda bin/unarddegos_ia32.hdd -m 64
+    qemu-system-x86_64 -hda bin/unarddegos_ia32.hdd -m 64 -nographic
 else
     echo "the file is not multiboot"
 fi
