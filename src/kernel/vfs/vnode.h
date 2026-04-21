@@ -56,7 +56,15 @@ typedef struct VNode
         VNodeTime              LastModified;
         VNodeTime              LastAccessed;
         VNodeFlags             Flags;
+        long                   FileOffset;
 } VNode;
+
+enum
+{
+        SEEK_SET,
+        SEEK_CUR,
+        SEEK_END,
+};
 
 // root will be a node,
 // where Root->ConstructChildren
@@ -68,6 +76,7 @@ void   RegisterChildVNode(VNode *const Parent, VNode *const Child);
 void   RegisterSiblingVNode(VNode *const Base, VNode *const Child);
 VNode *RootVNode(void);
 void   VNodeDefault(VNode *Node);
+void   VNodeSeek(VNode *Node, long SeekOffset, int SeekType);
 void   VNListTree(VNode *Base, int Depth);
 
 #endif

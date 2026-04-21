@@ -6,6 +6,26 @@
 
 VNode Root = {0};
 
+void VNodeSeek(VNode *Node,
+               long Offset,
+               int  Type)
+{
+        switch (Type)
+        {
+                case SEEK_SET:
+                        Node->FileOffset = Offset;
+                        break;
+                case SEEK_CUR:
+                        Node->FileOffset += Offset;
+                        break;
+                case SEEK_END:
+                        Panic(PANIC_TODO);
+                        break;
+                default:
+                        break;
+        }
+}
+
 // to prevent edge cases
 // for directories // drives, this would read from the RAW drive or error on dir
 static int DefaultReadFunction(void *const Buf,

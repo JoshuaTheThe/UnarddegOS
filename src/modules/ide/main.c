@@ -18,11 +18,12 @@ static int IDEReadFunction(void *const Buf,
                 return 0;
         IDEDev *Self = Node->DriverData;
         const size_t Bytes = Size * Elements;
-        unsigned int lba = 0; // TODO - file offset
+        unsigned int lba = Node->FileOffset; // NOTICE - This is aligned to sector
         unsigned int num_sectors = (Bytes + 511) / 512;
         IDEReadSectors(Self - IDEState.IDEDev, num_sectors, lba, 0x10, (unsigned int)Buf);
         if (package[0] != 0)
                 return -1;
+        Node->FileOffset += 1;
         return Elements;
 }
 
@@ -40,11 +41,12 @@ static int IDEWriteFunction(void *const Buf,
         if (Self->Type == IDE_ATAPI)
                 return -1;
         const size_t Bytes = Size * Elements;
-        unsigned int lba = 0; // TODO - file offset
+        unsigned int lba = Node->FileOffset; // NOTICE - This is aligned to sector
         unsigned int num_sectors = (Bytes + 511) / 512;
         IDEWriteSectors(Self - IDEState.IDEDev, num_sectors, lba, 0x10, (unsigned int)Buf);
         if (package[0] != 0)
                 return -1;
+        Node->FileOffset += 1;
         return Elements;
 }
 
