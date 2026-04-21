@@ -1,5 +1,5 @@
 #define FUNCTION
-#include <PCI/main.h>
+#include <pci/main.h>
 #include <vfs/vnode.h>
 #include <drivers/serial.h>
 #include <vmem/bumpalloc.h>
