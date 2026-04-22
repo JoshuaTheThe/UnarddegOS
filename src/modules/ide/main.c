@@ -3,9 +3,33 @@
 #include <vfs/vnode.h>
 #include <panic.h>
 #include <vmem/bumpalloc.h>
+#include <string.h>
 
 IDEDriver_t IDEState = {0};
 uint8_t package[2048], atapi_packet[2048];
+
+typedef struct
+{
+        unsigned char sector_buffer[512];
+        unsigned long cached_sector;
+        int cached_dirty;
+} IDECache;
+
+static int IsDrivePresent(unsigned char drive)
+{
+        if (drive > 3)
+                return 0;
+        if (IDEState.IDEDev[drive].Reserved == 0)
+                return 0;
+        unsigned int channel = IDEState.IDEDev[drive].Channel;
+        unsigned int slavebit = IDEState.IDEDev[drive].Drive;
+        IDEWrite(channel, ATA_REG_HDDEVSEL, 0xA0 | (slavebit << 4));
+        Delay(1);
+        uint8_t status = IDERead(channel, ATA_REG_STATUS);
+        if (status == 0xFF || status == 0x00)
+                return 0;
+        return 1;
+}
 
 static int IDEReadFunction(void *const Buf,
                            const unsigned long Size,
@@ -16,14 +40,58 @@ static int IDEReadFunction(void *const Buf,
         PanicIfNull(Node);
         if (Size == 0 || Elements == 0)
                 return 0;
+
         IDEDev *Self = Node->DriverData;
+
+        // Check if drive is present
+        unsigned char drive_num = Self - IDEState.IDEDev;
+        if (!IsDrivePresent(drive_num))
+        {
+                // Drive not present - return zeros
+                memset(Buf, 0, Size * Elements);
+                Node->FileOffset += Size * Elements;
+                return Elements;
+        }
+
         const size_t Bytes = Size * Elements;
-        unsigned int lba = Node->FileOffset; // NOTICE - This is aligned to sector
-        unsigned int num_sectors = (Bytes + 511) / 512;
-        IDEReadSectors(Self - IDEState.IDEDev, num_sectors, lba, 0x10, (unsigned int)Buf);
-        if (package[0] != 0)
-                return -1;
-        Node->FileOffset += 1;
+        unsigned char *dest = (unsigned char *)Buf;
+        unsigned long remaining = Bytes;
+        unsigned long current_offset = Node->FileOffset;
+        unsigned long bytesPerSector = Self->Type == IDE_ATAPI ? 2048 : 512;
+
+        while (remaining > 0)
+        {
+                unsigned long sector = current_offset / bytesPerSector;
+                unsigned long offset_in_sector = current_offset % bytesPerSector;
+                unsigned long bytes_this_iter = bytesPerSector - offset_in_sector;
+                if (bytes_this_iter > remaining)
+                        bytes_this_iter = remaining;
+
+                unsigned char sector_buffer[bytesPerSector];
+                if (sector >= Self->Size)
+                {
+                        memset(sector_buffer, 0, bytesPerSector);
+                }
+                else
+                {
+                        IDEReadSectors(drive_num, 1, sector, 0x10, (unsigned int)sector_buffer);
+                        if (package[0] != 0)
+                        {
+                                memset(sector_buffer, 0, bytesPerSector);
+                                package[0] = 0;
+                        }
+                }
+
+                for (unsigned long i = 0; i < bytes_this_iter; i++)
+                {
+                        dest[Bytes - remaining + i] = sector_buffer[offset_in_sector + i];
+                }
+
+                current_offset += bytes_this_iter;
+                remaining -= bytes_this_iter;
+        }
+
+        Node->FileOffset += Bytes;
         return Elements;
 }
 
@@ -36,17 +104,68 @@ static int IDEWriteFunction(void *const Buf,
         PanicIfNull(Node);
         if (Size == 0 || Elements == 0)
                 return 0;
+
         IDEDev *Self = Node->DriverData;
-        // Check if ATAPI (read-only)
+        unsigned char drive_num = Self - IDEState.IDEDev;
+        if (!IsDrivePresent(drive_num))
+        {
+                Node->FileOffset += Size * Elements;
+                return Elements;
+        }
+
         if (Self->Type == IDE_ATAPI)
                 return -1;
+
         const size_t Bytes = Size * Elements;
-        unsigned int lba = Node->FileOffset; // NOTICE - This is aligned to sector
-        unsigned int num_sectors = (Bytes + 511) / 512;
-        IDEWriteSectors(Self - IDEState.IDEDev, num_sectors, lba, 0x10, (unsigned int)Buf);
-        if (package[0] != 0)
-                return -1;
-        Node->FileOffset += 1;
+        const unsigned char *src = (const unsigned char *)Buf;
+        unsigned long remaining = Bytes;
+        unsigned long current_offset = Node->FileOffset;
+
+        while (remaining > 0)
+        {
+                unsigned long sector = current_offset / 512;
+                unsigned long offset_in_sector = current_offset % 512;
+                unsigned long bytes_this_iter = 512 - offset_in_sector;
+                if (bytes_this_iter > remaining)
+                        bytes_this_iter = remaining;
+
+                unsigned char sector_buffer[512];
+                if (offset_in_sector != 0 || bytes_this_iter != 512)
+                {
+                        if (sector < Self->Size)
+                        {
+                                IDEReadSectors(drive_num, 1, sector, 0x10, (unsigned int)sector_buffer);
+                                if (package[0] != 0)
+                                {
+                                        memset(sector_buffer, 0, 512);
+                                        package[0] = 0;
+                                }
+                        }
+                        else
+                        {
+                                memset(sector_buffer, 0, 512);
+                        }
+                }
+
+                for (unsigned long i = 0; i < bytes_this_iter; i++)
+                {
+                        sector_buffer[offset_in_sector + i] = src[Bytes - remaining + i];
+                }
+
+                if (sector < Self->Size)
+                {
+                        IDEWriteSectors(drive_num, 1, sector, 0x10, (unsigned int)sector_buffer);
+                        if (package[0] != 0)
+                        {
+                                package[0] = 0;
+                        }
+                }
+
+                current_offset += bytes_this_iter;
+                remaining -= bytes_this_iter;
+        }
+
+        Node->FileOffset += Bytes;
         return Elements;
 }
 
@@ -189,9 +308,9 @@ uint8_t IDEPrintErr(uint32_t drive, uint8_t err)
                 err = 8;
         }
         SerialPrint("- [%s %s] %s\n",
-               (const char *[]){"Primary", "Secondary"}[IDEState.IDEDev[drive].Channel],
-               (const char *[]){"Master", "Slave"}[IDEState.IDEDev[drive].Drive],
-               IDEState.IDEDev[drive].Model);
+                    (const char *[]){"Primary", "Secondary"}[IDEState.IDEDev[drive].Channel],
+                    (const char *[]){"Master", "Slave"}[IDEState.IDEDev[drive].Drive],
+                    IDEState.IDEDev[drive].Model);
 
         return err;
 }
@@ -305,13 +424,13 @@ void IDEInitialise(void)
 
                         if (count < 4) // simple char name for now
                         {
-                                VNode *Drv                 = NewVNode(VFS_READ | VFS_WRITE);
-                                Drv->Name.Name             = BumpAllocate(0x01);
-                                Drv->Name.Length           = 0x1;
-                                Drv->WriteFunction         = IDEWriteFunction;
-                                Drv->ReadFunction          = IDEReadFunction;
-                                Drv->DriverData            = &IDEState.IDEDev[count];
-                                ((char *)Drv->Name.Name)[0]= count + 'A';
+                                VNode *Drv = NewVNode(VFS_READ | VFS_WRITE);
+                                Drv->Name.Name = BumpAllocate(0x01);
+                                Drv->Name.Length = 0x1;
+                                Drv->WriteFunction = IDEWriteFunction;
+                                Drv->ReadFunction = IDEReadFunction;
+                                Drv->DriverData = &IDEState.IDEDev[count];
+                                ((char *)Drv->Name.Name)[0] = count + 'A';
                                 VNode *Dev = RootVNode()->RelativeFind(RootVNode(), "/dev", 4);
                                 RegisterChildVNode(Dev, Drv);
                         }
@@ -543,6 +662,16 @@ void IDEReadSectors(unsigned char drive, unsigned char numsects, unsigned int lb
                     unsigned short es, unsigned int edi)
 {
         int i;
+        if (!IsDrivePresent(drive))
+        {
+                package[0] = 0;
+                for (unsigned int bytes = 0; bytes < numsects * 512; bytes++)
+                {
+                        ((unsigned char *)edi)[bytes] = 0;
+                }
+                return;
+        }
+
         if (drive > 3 || IDEState.IDEDev[drive].Reserved == 0)
                 package[0] = 0x1;
         else if (((lba + numsects) > IDEState.IDEDev[drive].Size) && (IDEState.IDEDev[drive].Type == IDE_ATA))
@@ -562,6 +691,12 @@ void IDEReadSectors(unsigned char drive, unsigned char numsects, unsigned int lb
 void IDEWriteSectors(unsigned char drive, unsigned char numsects, unsigned int lba,
                      unsigned short es, unsigned int edi)
 {
+        if (!IsDrivePresent(drive))
+        {
+                package[0] = 0;
+                return;
+        }
+
         if (drive > 3 || IDEState.IDEDev[drive].Reserved == 0)
                 package[0] = 0x1;
         else if (((lba + numsects) > IDEState.IDEDev[drive].Size) && (IDEState.IDEDev[drive].Type == IDE_ATA))
