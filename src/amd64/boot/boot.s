@@ -1,19 +1,31 @@
-.section .multiboot
+        .section .multiboot
         .align 8
 multiboot_header:
         .long 0xE85250D6
         .long 0
         .long (multiboot_header_end - multiboot_header)
-        .long 0x100000000 - (0xE85250D6 + 0 + (multiboot_header_end - multiboot_header))
+        .long -(0xE85250D6 + 0 + (multiboot_header_end - multiboot_header))  /* Fixed checksum */
+        
+        /* Address tag - tells GRUB where to load */
         .align 8
-        .word 1
-        .word 0
-        .long 8
-        .long 0
+        .word 2          /* Tag type: address */
+        .word 0          /* Flags */
+        .long 24         /* Tag size (including header) */
+        .long 0x200000   /* header_addr = 0x200000 (where header is in final image) */
+        .long 0x200000   /* load_addr = 0x200000 (load kernel here) */
+        .long 0          /* load_end_addr (0 = whole file) */
+        .long 0          /* bss_end_addr (0 = no BSS) */
+        
         .align 8
-        .word 0
-        .word 0
-        .long 8
+        .word 3                             /* Tag type: entry address */
+        .word 0                             /* Flags */
+        .long 16                            /* Tag size */
+        .long _start                        /* entry_addr */
+
+        .align 8
+        .word 1          /* Tag type: required end */
+        .word 0          /* Flags */
+        .long 8          /* Tag size */
 multiboot_header_end:
 
         .equ CR0_PAGING,        0x80000000
@@ -33,6 +45,16 @@ multiboot_header_end:
         .equ EFER_LM_ENABLE,    0x100
         .equ CR0_PM_ENABLE,     0x1
         .equ CR0_PG_ENABLE,     CR0_PAGING
+        .equ PRESENT, 128
+        .equ NOT_SYS, 16
+        .equ EXEC, 8
+        .equ DC, 4
+        .equ RW, 2
+        .equ ACCESSED, 1
+        .equ GRAN_4K, 128
+        .equ SZ_32, 64
+        .equ LONG_MODE, 32
+
 
         .section .text
         .code32
@@ -92,7 +114,6 @@ PageFill:
         addl $SIZEOF_PT_ENTRY, %edi
         loop 2b
 
-        lgdt (gdt64_ptr)
 PAEEnable:
         movl %cr4, %eax
         orl  $CR4_PAE_ENABLE, %eax
@@ -103,11 +124,16 @@ Compatibility:
         rdmsr
         orl  $EFER_LM_ENABLE, %eax
         wrmsr
+        movl $PML4T_ADDR, %eax
+        movl %eax, %cr3
 
-        pushl    $8
-        pushl    $(_start64 + 0x200000)
-        lret
+        movl %cr0, %eax
+        orl  $CR0_PG_ENABLE, %eax
+        movl %eax, %cr0
 
+        lgdt (GDT.Pointer)
+        ljmp $8,$Realm64
+Realm64:
         .code64
 _start64:
         movw $0x10, %ax
@@ -117,10 +143,13 @@ _start64:
         movw %ax, %gs
         movw %ax, %ss
         movq $stack_top, %rsp
+        andq $~0xF, %rsp
+        subq $16, %rsp
         xorq %rbp, %rbp
-        movl args, %edi
-        movl args+8, %esi
-        call kmain
+        movq args, %rdi
+        movq args+8, %rsi
+1:      jmp 1b
+        callq kmain
 
 .hang64:
         cli
@@ -136,15 +165,23 @@ _start64:
         .align 8
         .size _start, . - _start
         .section .data
-gdt64:
-        .quad 0x0000000000000000
-        .quad 0x00af9a000000ffff
-        .quad 0x00cf92000000ffff
-gdt64_end:
-
-gdt64_ptr:
-        .word gdt64_end - gdt64 - 1
-        .quad gdt64
+GDT:
+        .quad 0
+        .Code.limit_lo: .word 0xffff
+        .Code.base_lo: .word 0
+        .Code.base_mid: .byte 0
+        .Code.access: .byte (PRESENT | NOT_SYS | EXEC | RW)
+        .Code.flags: .byte GRAN_4K | LONG_MODE | 0xF   # Flags & Limit (high, bits 16-19)
+        .Code.base_hi: .byte 0
+        .Data.limit_lo: .word 0xffff
+        .Data.base_lo: .word 0
+        .Data.base_mid: .byte 0
+        .Data.access: .byte PRESENT | NOT_SYS | RW
+        .Data.Flags: .byte GRAN_4K | SZ_32 | 0xF       # Flags & Limit (high, bits 16-19)
+        .Data.base_hi: .byte 0
+GDT.Pointer:
+        .word GDT.Pointer - GDT - 1
+        .quad GDT
         .section .bss
         .align 16
 stack_bottom:
