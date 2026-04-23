@@ -154,6 +154,12 @@ static VNode *DefaultRelativeFindFunction(VNode *Base, const char *const Relativ
                 }
                 else
                 {
+                        if (CurrentNode->Flags & VFS_ONDISK)
+                        {
+                                CurrentNode->ConstructChildren(CurrentNode, 1); // just construct base
+                                // TODO - cleanup
+                        }
+
                         VNode *Child = CurrentNode->FirstChild;
                         while (Child != NULL)
                         {
@@ -170,6 +176,11 @@ static VNode *DefaultRelativeFindFunction(VNode *Base, const char *const Relativ
                 }
         }
 
+        if (CurrentNode->Flags & VFS_LINK)
+        {
+                return CurrentNode->Link;
+        }
+        
         return CurrentNode;
 }
 

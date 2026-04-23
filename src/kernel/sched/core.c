@@ -6,7 +6,7 @@
 #define __NEXT_PROC
 #include <sched/trap.h>
 
-VNode *CurrentProc = NULL, *Proc = NULL;
+VNode *CurrentProc = NULL, *Proc = NULL, *SelfProc = NULL;
 Task ScratchProc = {0};
 static const char ProcDir[] = "proc";
 uint64_t Ticks = 0;
@@ -24,14 +24,19 @@ void CommitProcessLoad(void)
 void CommitNextProcess(void)
 {
         Ticks += 1;
-        if (CurrentProc == NULL || CurrentProc->Next == NULL)
+        do
         {
-                CurrentProc = Proc->FirstChild;
+                if (CurrentProc == NULL || CurrentProc->Next == NULL)
+                {
+                        CurrentProc = Proc->FirstChild;
+                }
+                else
+                {
+                        CurrentProc = CurrentProc->Next;
+                }
         }
-        else
-        {
-                CurrentProc = CurrentProc->Next;
-        }
+        while (CurrentProc == SelfProc);
+        SelfProc->Link = CurrentProc;
         EnableNextProcess();
         CommitProcessLoad();
 }
@@ -68,6 +73,11 @@ static void SchedulerCreateProcDir(void)
         Proc->Name.Name = ProcDir;
         Proc->Name.Length = sizeof(ProcDir) - 1;
         RegisterChildVNode(RootVNode(), Proc);
+        VNode *Self = NewVNode(VFS_SYSTEM);
+        Self->Name.Name = "self";
+        Self->Name.Length = 4;
+        SelfProc = Self;
+        RegisterChildVNode(Proc, Self);
 }
 
 static VNode *SchedulerCreateProc(TaskRegisters InitialState)
