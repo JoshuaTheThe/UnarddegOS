@@ -8,7 +8,9 @@
 #include <vfs/vfd.h>
 #include <string.h>
 #include <sched/core.h>
+#ifdef MODULE
 #include <module.h>
+#endif
 
 void kmain(unsigned int a, unsigned int b)
 {
@@ -18,7 +20,9 @@ void kmain(unsigned int a, unsigned int b)
         VFSCreateDevices();
         SchedulerInitialise();
         ArchSti();
+        #ifdef MODULE
         LoadModules(a, b);
+        #endif
         FileDescriptor File = open("/dev/tty0", 0);
         write(File, ArchIdentify(), strnlen(ArchIdentify(), 64));
         write(File, Message, sizeof(Message));

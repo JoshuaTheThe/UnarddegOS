@@ -160,6 +160,5 @@ struct loaded_module
 
 void LoadModule(void *addr, size_t size, const char *name);
 void *FindKernelSymbol(const char *name);
-void LoadModules(unsigned int magic, unsigned int mb_info_addr);
 
 #endif

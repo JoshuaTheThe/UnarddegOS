@@ -37,3 +37,8 @@ void ArchSti(void)
         __asm volatile("csrs mie, %0" :: "r"(1 << 7));
         __asm volatile ("csrrsi zero, mstatus, 0x8");
 }
+
+void ArchPause(void)
+{
+        __asm volatile("wfi");
+}

@@ -62,3 +62,8 @@ void ArchSti(void)
 {
         __asm volatile ("cpsie i");
 }
+
+void ArchPause(void)
+{
+        __asm volatile("wfi");
+}

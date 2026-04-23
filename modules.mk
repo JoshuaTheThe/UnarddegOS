@@ -20,7 +20,7 @@ $(MODULES_BIN_DIR)/%.ko: $(MODULES_BUILD_DIR)/%/main.o
 
 $(MODULES_BUILD_DIR)/%/main.o: $(MODULES_DIR)/%/main.c
 	@mkdir -p $(dir $@)
-	$(KCC) $(KCFLAGS) $(KCPPFLAGS) -fno-pic -fno-pie -I src/kernel -I src/modules -I $(SRC)/$(ARCH) -c -o $@ $< -mno-tls-direct-seg-refs -fno-tls-model -U__TLS__
+	$(KCC) $(KCFLAGS) $(KCPPFLAGS) -fno-pic -fno-pie -I src/kernel -I src/modules -I $(SRC)/$(ARCH) -c -o $@ $< $(ARCH_MODULE_FLAGS)
 
 clean-modules:
 	rm -rf $(MODULES_BUILD_DIR) $(MODULES_BIN_DIR)

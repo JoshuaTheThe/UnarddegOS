@@ -4,7 +4,6 @@
 #include <io.h>
 #include <panic.h>
 #include <_arch.h>
-#include <module.h>
 #include <idt.h>
 
 enum cpu_vendor
