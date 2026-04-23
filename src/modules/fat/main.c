@@ -133,33 +133,11 @@ DWORD FatNextCluster(FATBootSector *bt, DWORD cluster, VNode *Drive)
 int Init(void)
 {
         VNode *Root = RootVNode();
-        VNode *Mnt = NULL;
-        VNode *dev_dir = NULL;
-        VNode *child = Root->FirstChild;
-        while (child)
-        {
-                if (child->Name.Length == 3 &&
-                    child->Name.Name[0] == 'm' &&
-                    child->Name.Name[1] == 'n' &&
-                    child->Name.Name[2] == 't')
-                {
-                        Mnt = child;
-                        break;
-                }
-                child = child->Next;
-        }
-
-        if (!Mnt)
-        {
-                Mnt = NewVNode(VFS_READ | VFS_WRITE);
-                Mnt->Name.Name = "mnt";
-                Mnt->Name.Length = 3;
-                RegisterChildVNode(Root, Mnt);
-        }
-
-        dev_dir = Root->RelativeFind(Root, "/dev", 4);
+        VNode *Mnt = Root->RelativeFind(Root, "/mnt", 4);
+        VNode *dev_dir = Root->RelativeFind(Root, "/dev", 4);
         VNode *Node = dev_dir->FirstChild;
         FATBootSector bs = {0};
+        (void)Mnt;
 
         while (Node)
         {

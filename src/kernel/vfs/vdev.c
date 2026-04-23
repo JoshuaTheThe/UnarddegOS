@@ -23,4 +23,9 @@ void VFSCreateDevices(void)
         // create devices
         Trace((void)CreateNullDevice("null", 4, Node));
         Trace((void)CreateSerialDevice("tty0", 4, Node));
+
+        VNode *Mnt = NewVNode(VFS_SYSTEM);
+        Mnt->Name.Name   = "mnt";
+        Mnt->Name.Length = 3;
+        RegisterChildVNode(RootVNode(), Mnt);
 }
