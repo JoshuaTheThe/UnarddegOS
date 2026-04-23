@@ -425,12 +425,14 @@ void IDEInitialise(void)
                         if (count < 4) // simple char name for now
                         {
                                 VNode *Drv = NewVNode(VFS_READ | VFS_WRITE);
-                                Drv->Name.Name = BumpAllocate(0x01);
-                                Drv->Name.Length = 0x1;
+                                Drv->Name.Name = BumpAllocate(0x03);
+                                Drv->Name.Length = 0x3;
                                 Drv->WriteFunction = IDEWriteFunction;
                                 Drv->ReadFunction = IDEReadFunction;
                                 Drv->DriverData = &IDEState.IDEDev[count];
-                                ((char *)Drv->Name.Name)[0] = count + 'A';
+                                ((char *)Drv->Name.Name)[0] = 'h';
+                                ((char *)Drv->Name.Name)[1] = 'd';
+                                ((char *)Drv->Name.Name)[2] = count + 'a';
                                 VNode *Dev = RootVNode()->RelativeFind(RootVNode(), "/dev", 4);
                                 RegisterChildVNode(Dev, Drv);
                         }
