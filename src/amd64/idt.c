@@ -43,6 +43,4 @@ void IdtInit(void)
         outb(0xA1, 0x01);
         outb(0x21, 0xFA);
         outb(0xA1, 0x3F);
-
-        ArchSti(); /* Re-enable interrupts */
 }

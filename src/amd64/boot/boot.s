@@ -6,22 +6,6 @@ multiboot_header:
         .long (multiboot_header_end - multiboot_header)
         .long -(0xE85250D6 + 0 + (multiboot_header_end - multiboot_header))  /* Fixed checksum */
         
-        /* Address tag - tells GRUB where to load */
-        .align 8
-        .word 2          /* Tag type: address */
-        .word 0          /* Flags */
-        .long 24         /* Tag size (including header) */
-        .long 0x200000   /* header_addr = 0x200000 (where header is in final image) */
-        .long 0x200000   /* load_addr = 0x200000 (load kernel here) */
-        .long 0          /* load_end_addr (0 = whole file) */
-        .long 0          /* bss_end_addr (0 = no BSS) */
-        
-        .align 8
-        .word 3                             /* Tag type: entry address */
-        .word 0                             /* Flags */
-        .long 16                            /* Tag size */
-        .long _start                        /* entry_addr */
-
         .align 8
         .word 1          /* Tag type: required end */
         .word 0          /* Flags */
@@ -100,16 +84,20 @@ PageFill:
         movl $PT_ADDR, %edi
         movl $(0x200000 | PT_PRESENT | PT_WRITABLE), %ebx
         movl $ENTRIES_PER_PT, %ecx
+        xorl %edx, %edx           /* Clear upper 32 bits (no NX) */
 1:      movl %ebx, (%edi)
+        movl %edx, 4(%edi)        /* Upper 32 bits = 0 -> execute allowed */
         addl $PAGE_SIZE, %ebx
         addl $SIZEOF_PT_ENTRY, %edi
         loop 1b
 
-        /* PT2: virt 0x0+N -> phys 0x0+N (identity map, covers stack) */
+        /* PT2: identity mapping */
         movl $PT2_ADDR, %edi
         movl $(PT_PRESENT | PT_WRITABLE), %ebx
-        movl $(8 * SIZEOF_PAGE_TABLE), %ecx
+        movl $ENTRIES_PER_PT, %ecx
+        xorl %edx, %edx
 2:      movl %ebx, (%edi)
+        movl %edx, 4(%edi)        /* Upper 32 bits = 0 */
         addl $PAGE_SIZE, %ebx
         addl $SIZEOF_PT_ENTRY, %edi
         loop 2b
@@ -148,7 +136,6 @@ _start64:
         xorq %rbp, %rbp
         movq args, %rdi
         movq args+8, %rsi
-1:      jmp 1b
         callq kmain
 
 .hang64:

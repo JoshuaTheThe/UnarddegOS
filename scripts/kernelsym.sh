@@ -6,7 +6,6 @@ OUTPUT_FILE="src/symbols.c"
 echo "// Auto-generated kernel symbol table" > $OUTPUT_FILE
 echo "// Generated on: $(date)" >> $OUTPUT_FILE
 echo "" >> $OUTPUT_FILE
-echo "#include <module.h>" >> $OUTPUT_FILE
 echo "#include <string.h>" >> $OUTPUT_FILE
 echo "" >> $OUTPUT_FILE
 echo "struct KernelSymbol" >> $OUTPUT_FILE
