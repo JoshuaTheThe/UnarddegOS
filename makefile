@@ -1,7 +1,7 @@
 
 override MAKEFLAGS += -rR
 
-ARCH := ia32
+ARCH := amd64
 override BIN := bin
 override SRC := src
 override KERNEL := $(SRC)/kernel
