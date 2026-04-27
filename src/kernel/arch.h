@@ -11,5 +11,6 @@ void ArchSti(void); // enable interrupts, or any other thing that may cause CPU 
 void Delay(unsigned long ticks);
 int ArchGetTemperatureMC(void);
 void ArchPause(void);
+void LoadModules(unsigned int a, unsigned int b);
 
 #endif

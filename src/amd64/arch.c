@@ -5,6 +5,7 @@
 #include <panic.h>
 #include <_arch.h>
 #include <idt.h>
+#include <module.h>
 
 enum cpu_vendor
 {
@@ -78,6 +79,29 @@ void TimerInit(uint32_t targetFreq)
         outb(PIT_CHANNEL0, (divisor >> 8) & 0xFF);
 }
 
+void LoadModules(unsigned int magic, unsigned int mb_info_addr)
+{
+        (void)magic;
+        unsigned int offset = 8;
+        struct multiboot_tag *tag;
+        while (1)
+        {
+                tag = (struct multiboot_tag *)((uint64_t)mb_info_addr + offset);
+
+                if (tag->type == 0)
+                        break;
+                if (tag->type == 3)
+                {
+                        struct multiboot_tag_module *mod = (struct multiboot_tag_module *)tag;
+                        LoadModule((void *)(uint64_t)mod->mod_start,
+                                   mod->mod_end - mod->mod_start,
+                                   mod->cmdline);
+                }
+
+                offset += (tag->size + 7) & ~7;
+        }
+}
+
 void ArchInitialise(unsigned int magic, unsigned int mb_info_addr)
 {
         (void)mb_info_addr;
@@ -88,12 +112,6 @@ void ArchInitialise(unsigned int magic, unsigned int mb_info_addr)
 
         IdtInit();
         TimerInit(100);
-}
-
-void LoadModules(unsigned int a, unsigned int b)
-{
-        (void)a;
-        (void)b;
 }
 
 char *ArchIdentify(void)

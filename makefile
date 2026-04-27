@@ -62,10 +62,10 @@ all: bin/$(OUTPUT)
 
 bin/$(OUTPUT): $(OBJ) modules
 	mkdir -p "$$(dirname $@)"
-	@bash "scripts/kernelsym.sh"
+	@bash "scripts/kernelsym.sh" $(ARCH)
 	$(KCC) $(KCFLAGS) $(KCPPFLAGS) -c $(SRC)/symbols.c -o obj/symbols.c.o -I $(KERNEL) -I $(SRC)/$(ARCH)
 	$(KLD) $(OBJ) obj/symbols.c.o $(KLDFLAGS) -o $@ -T $(ARCH_LINKER_SCRIPT) 
-	@bash "scripts/kernelsym.sh"
+	@bash "scripts/kernelsym.sh" $(ARCH)
 	$(KCC) $(KCFLAGS) $(KCPPFLAGS) -c $(SRC)/symbols.c -o obj/symbols.c.o -I $(KERNEL) -I $(SRC)/$(ARCH)
 	$(KLD) $(OBJ) obj/symbols.c.o $(KLDFLAGS) -o $@ -T $(ARCH_LINKER_SCRIPT) 
 	@echo " [INFO] Built $(OUTPUT) for architecture $(ARCH)"

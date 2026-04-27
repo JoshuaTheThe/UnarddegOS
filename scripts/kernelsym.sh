@@ -1,6 +1,6 @@
 #!/bin/bash
 
-KERNEL_BIN="bin/unarddegos_ia32.o"
+KERNEL_BIN="bin/unarddegos_$1.o"
 OUTPUT_FILE="src/symbols.c"
 
 echo "// Auto-generated kernel symbol table" > $OUTPUT_FILE
