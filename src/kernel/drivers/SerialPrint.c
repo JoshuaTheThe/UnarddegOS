@@ -19,7 +19,13 @@ void SerialPrintHex(uint32_t value)
 {
         char hex_buffer[9];
         IntegerToHexadecimal(value, hex_buffer);
-        for (int i = 0; i < 8; i++)
+        int start = 0;
+        while (start < 7 && hex_buffer[start] == '0')
+        {
+                start++;
+        }
+
+        for (int i = start; i < 8; i++)
         {
                 SerialPut(hex_buffer[i]);
         }

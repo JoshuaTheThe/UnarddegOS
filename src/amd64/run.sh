@@ -24,7 +24,7 @@ if grub-file --is-x86-multiboot2 bin/unarddegos_amd64.o; then
     sudo umount /mnt
     sudo losetup -d ${LOOP}
     qemu-system-x86_64 -hda bin/unarddegos_amd64.hdd -m 256 -cpu max \
-        -d cpu_reset,guest_errors -D qemu.log
+        -d cpu_reset,guest_errors -D qemu.log -M pc
 else
     echo "the file is not multiboot2"
 fi

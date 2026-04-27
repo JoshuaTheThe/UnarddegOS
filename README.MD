@@ -1,6 +1,6 @@
 # OS/11 - A Modular Unix-like Kernel
 
-**Version:** 0.0.39 (major.minor.commit)
+**Version:** 0.0.80 (major.minor.commit)
 **Architectures:** x86 (ia32), ARMv7, RISC-V 64  
 **License:** idgaf, MIT
 

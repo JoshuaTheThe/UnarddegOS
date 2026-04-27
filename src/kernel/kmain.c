@@ -21,6 +21,7 @@ void kmain(unsigned int a, unsigned int b)
         SchedulerInitialise();
         ArchSti();
         #ifdef MODULE
+        SerialPrint(" [Info] Loading Modules...\r\n");
         LoadModules(a, b);
         #endif
         FileDescriptor File = open("/dev/tty0", 0);

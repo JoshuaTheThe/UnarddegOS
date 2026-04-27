@@ -4,6 +4,8 @@
 #define HAS_TEMPERATURE
 #define MODULE
 #include <stdint.h>
+#pragma pack(push)
+#pragma pack(1)
 
 struct multiboot_tag
 {
@@ -26,5 +28,7 @@ struct multiboot_tag_module
         uint32_t mod_end;
         char cmdline[];
 };
+
+#pragma pack(pop)
 
 #endif

@@ -26,6 +26,8 @@ unsigned long write(FileDescriptor fd,
 unsigned long read(FileDescriptor fd,
                    void *const Buf,
                    unsigned long Count);
+long lseek(FileDescriptor fd,
+           long Offset, int Whence);
 // close would follow but there is no way to free memory (yet)
 
 #endif

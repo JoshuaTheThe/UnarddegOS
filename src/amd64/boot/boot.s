@@ -13,11 +13,11 @@ multiboot_header:
 multiboot_header_end:
 
         .equ CR0_PAGING,        0x80000000
-        .equ PML4T_ADDR,        0x1000
-        .equ PDPT_ADDR,         0x2000
-        .equ PDT_ADDR,          0x3000
-        .equ PT_ADDR,           0x4000      /* virt 0x200000 -> phys 0x0 (kernel) */
-        .equ PT2_ADDR,          0x5000      /* virt 0x0      -> phys 0x0 (identity, stack) */
+        .equ PML4T_ADDR,        0x400000
+        .equ PDPT_ADDR,         0x600000
+        .equ PDT_ADDR,          0x800000
+        .equ PT_ADDR,           0x1000000      /* virt 0x200000 -> phys 0x0 (kernel) */
+        .equ PT2_ADDR,          0x1200000      /* virt 0x0      -> phys 0x0 (identity, stack) */
         .equ SIZEOF_PAGE_TABLE, 4096
         .equ PT_PRESENT,        1
         .equ PT_WRITABLE,       2
@@ -131,11 +131,14 @@ _start64:
         movw %ax, %gs
         movw %ax, %ss
         movq $stack_top, %rsp
+        subq $256, %rsp
         andq $~0xF, %rsp
-        subq $16, %rsp
         xorq %rbp, %rbp
-        movq args, %rdi
-        movq args+8, %rsi
+        xorl %edi, %edi
+        xorl %esi, %esi
+        movq $args,   %rdi
+        movq 8(%rdi), %rsi
+        movq  (%rdi), %rdi
         callq kmain
 
 .hang64:
@@ -172,7 +175,7 @@ GDT.Pointer:
         .section .bss
         .align 16
 stack_bottom:
-        .skip 65536
+        .skip 65536*4
 stack_top:
 args:
         .quad 0

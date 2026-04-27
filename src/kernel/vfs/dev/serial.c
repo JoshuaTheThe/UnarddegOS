@@ -78,7 +78,7 @@ VNode *CreateSerialDevice(const char *const Name, unsigned long NameLength, VNod
         *(TTYFlags *)NewSerialDevice->DriverData = TTY_COOKED | TTY_ECHO | TTY_NLCR | TTY_CRNL;
         RegisterChildVNode(Devices, NewSerialDevice);
         NewSerialDevice->WriteFunction(" [Info] Created Serial Virtual Node\r\n",
-                                       38,
+                                       37,
                                        1,
                                        NewSerialDevice);
         return NewSerialDevice;

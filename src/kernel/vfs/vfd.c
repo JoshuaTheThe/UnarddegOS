@@ -42,6 +42,13 @@ static FileDescriptor CreateEntry(VNode *Node)
         return Current++;
 }
 
+long lseek(FileDescriptor fd, long Offset, int Whence)
+{
+        _FileDescriptor *File = find(fd);
+        VNodeSeek(File->Reference, Offset, Whence);
+        return File->Reference->FileOffset;
+}
+
 // snippet from my vfs impl
 FileDescriptor open(char *const PathFromRoot, VNodeFlags Flags)
 {

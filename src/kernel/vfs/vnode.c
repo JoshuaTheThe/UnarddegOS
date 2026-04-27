@@ -208,6 +208,7 @@ VNode *NewVNode(VNodeFlags Flags)
         // panics on fail, memsets automatically
         VNode *NewNode = BumpAllocate(sizeof(*NewNode));
         NewNode->Flags = Flags;
+        NewNode->FileOffset = 0;
         VNodeDefault(NewNode);
         return NewNode;
 }

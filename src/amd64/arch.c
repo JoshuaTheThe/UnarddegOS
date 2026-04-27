@@ -83,20 +83,22 @@ void LoadModules(unsigned int magic, unsigned int mb_info_addr)
 {
         (void)magic;
         size_t offset = 8;
-        struct multiboot_tag *tag;
+        uint8_t *base = (void *)((uint64_t)mb_info_addr);
         while (1)
         {
-                tag = (struct multiboot_tag *)((uint64_t)mb_info_addr + offset);
-
+                struct multiboot_tag *tag = (struct multiboot_tag *)(&base[offset]);
                 if (tag->type == 0)
                         break;
                 if (tag->type == 3)
                 {
                         struct multiboot_tag_module *mod = (struct multiboot_tag_module *)tag;
-                        LoadModule((void *)(uint64_t)mod->mod_start,
+                        uint64_t mod_base = (uint64_t)mod->mod_start;
+                        LoadModule((void *)mod_base,
                                    mod->mod_end - mod->mod_start,
                                    mod->cmdline);
                 }
+
+                SerialPrint(" [Info] Tag@%x = [%x,%d]\r\n", tag, tag->type, tag->size);
 
                 offset += (tag->size + 7) & ~7;
         }
