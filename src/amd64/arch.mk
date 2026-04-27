@@ -8,4 +8,4 @@ override ARCH_RUN_SCRIPT := src/amd64/run.sh
 
 override KCC = clang
 
-MODULE_NAMES += pci fat
+MODULE_NAMES += pci fat ide

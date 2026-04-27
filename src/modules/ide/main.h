@@ -116,8 +116,8 @@ void IDEWrite(uint8_t channel, uint8_t reg, uint8_t data);
 uint8_t IDERead(uint8_t channel, uint8_t reg);
 void IDEFind(PCI *Pci, size_t Index);
 void IDEReadSectors(unsigned char drive, unsigned char numsects, unsigned int lba,
-                    unsigned short es, unsigned int edi);
+                    unsigned short es, uintptr_t edi);
 void IDEWriteSectors(unsigned char drive, unsigned char numsects, unsigned int lba,
-                       unsigned short es, unsigned int edi);
+                       unsigned short es, uintptr_t edi);
 
 #endif

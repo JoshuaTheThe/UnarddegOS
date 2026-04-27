@@ -74,7 +74,7 @@ static int IDEReadFunction(void *const Buf,
                 }
                 else
                 {
-                        IDEReadSectors(drive_num, 1, sector, 0x10, (unsigned int)sector_buffer);
+                        IDEReadSectors(drive_num, 1, sector, 0x10, (uintptr_t)sector_buffer);
                         if (package[0] != 0)
                         {
                                 memset(sector_buffer, 0, bytesPerSector);
@@ -134,7 +134,7 @@ static int IDEWriteFunction(void *const Buf,
                 {
                         if (sector < Self->Size)
                         {
-                                IDEReadSectors(drive_num, 1, sector, 0x10, (unsigned int)sector_buffer);
+                                IDEReadSectors(drive_num, 1, sector, 0x10, (uintptr_t)sector_buffer);
                                 if (package[0] != 0)
                                 {
                                         memset(sector_buffer, 0, 512);
@@ -154,7 +154,7 @@ static int IDEWriteFunction(void *const Buf,
 
                 if (sector < Self->Size)
                 {
-                        IDEWriteSectors(drive_num, 1, sector, 0x10, (unsigned int)sector_buffer);
+                        IDEWriteSectors(drive_num, 1, sector, 0x10, (uintptr_t)sector_buffer);
                         if (package[0] != 0)
                         {
                                 package[0] = 0;
@@ -559,10 +559,8 @@ unsigned char IDEAccess(unsigned char direction, unsigned char drive, unsigned i
                 {
                         if ((err = IDEPolling(channel, 1)))
                                 return err;
-                        __asm volatile("pushw %es");
                         __asm volatile("mov %%ax, %%es" : : "a"(selector));
                         __asm volatile("rep insw" : : "c"(words), "d"(bus), "D"(edi));
-                        __asm volatile("popw %es");
                         edi += (words * 2);
                 }
         }
@@ -571,10 +569,8 @@ unsigned char IDEAccess(unsigned char direction, unsigned char drive, unsigned i
                 for (i = 0; i < numsects; i++)
                 {
                         IDEPolling(channel, 0);
-                        __asm volatile("pushw %ds");
                         __asm volatile("mov %%ax, %%ds" ::"a"(selector));
                         __asm volatile("rep outsw" ::"c"(words), "d"(bus), "S"(edi));
-                        __asm volatile("popw %ds");
                         edi += (words * 2);
                 }
                 IDEWrite(channel, ATA_REG_COMMAND, (char[]){ATA_CMD_CACHE_FLUSH, ATA_CMD_CACHE_FLUSH, ATA_CMD_CACHE_FLUSH_EXT}[lba_mode]);
@@ -641,10 +637,8 @@ unsigned char IDEAtaPIRead(unsigned char drive, unsigned int lba, unsigned char 
                 if ((err = IDEPolling(channel, 1)))
                         return err;
 
-                __asm volatile("pushw %es");
                 __asm volatile("mov %%ax, %%es" ::"a"(selector));
                 __asm volatile("rep insw" ::"c"(words), "d"(bus), "D"(edi));
-                __asm volatile("popw %es");
                 edi += (words * 2);
         }
 
@@ -661,7 +655,7 @@ unsigned char IDEAtaPIRead(unsigned char drive, unsigned int lba, unsigned char 
 }
 
 void IDEReadSectors(unsigned char drive, unsigned char numsects, unsigned int lba,
-                    unsigned short es, unsigned int edi)
+                    unsigned short es, uintptr_t edi)
 {
         int i;
         if (!IsDrivePresent(drive))
@@ -691,7 +685,7 @@ void IDEReadSectors(unsigned char drive, unsigned char numsects, unsigned int lb
 }
 
 void IDEWriteSectors(unsigned char drive, unsigned char numsects, unsigned int lba,
-                     unsigned short es, unsigned int edi)
+                     unsigned short es, uintptr_t edi)
 {
         if (!IsDrivePresent(drive))
         {

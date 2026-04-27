@@ -82,7 +82,7 @@ void TimerInit(uint32_t targetFreq)
 void LoadModules(unsigned int magic, unsigned int mb_info_addr)
 {
         (void)magic;
-        unsigned int offset = 8;
+        size_t offset = 8;
         struct multiboot_tag *tag;
         while (1)
         {

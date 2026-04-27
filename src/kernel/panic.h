@@ -31,6 +31,7 @@ typedef enum
         PANIC_DOUBLE_OPEN,
         PANIC_FD_NOT_FOUND,
         PANIC_INCORRECT_BOOTLOADER,
+        PANIC_UNHANDLED_INTERRUPT,
 } PanicCode;
 
 typedef struct
