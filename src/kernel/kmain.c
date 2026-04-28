@@ -2,6 +2,7 @@
 #include <drivers/serial.h>
 #include <panic.h>
 #include <vmem/bumpalloc.h>
+#include <vmem/bitmap.h>
 #include <arch.h>
 #include <vfs/vnode.h>
 #include <vfs/vdev.h>
@@ -24,6 +25,7 @@ void kmain(unsigned int a, unsigned int b)
         SerialPrint(" [Info] Loading Modules...\r\n");
         LoadModules(a, b);
         #endif
+        AllocatePage();
         FileDescriptor File = open("/dev/tty0", 0);
         write(File, ArchIdentify(), strnlen(ArchIdentify(), 64));
         write(File, Message, sizeof(Message));
