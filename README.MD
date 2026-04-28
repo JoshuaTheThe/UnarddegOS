@@ -1,4 +1,5 @@
 # OS/11 - A Modular Unix-like Kernel
+Kernel made for educational purposes.
 
 **Version:** 0.0.80 (major.minor.commit)
 **Architectures:** x86 (ia32), ARMv7, RISC-V 64  
