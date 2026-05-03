@@ -217,7 +217,7 @@ void DeleteVNode(VNode *Node)
 {
         PanicIfNull(Node);
         VNode *Child = Node->FirstChild;
-        if (Child)
+        while (Child)
         {
                 VNode *Next = Child->Next;
                 DeleteVNode(Child);

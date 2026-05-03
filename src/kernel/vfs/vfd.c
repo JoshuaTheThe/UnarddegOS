@@ -4,13 +4,11 @@
 #include <string.h>
 #include <vmem/alloc.h>
 
-_FileDescriptor *Files = NULL;
+_FileDescriptor Files = {.Next = NULL, .FileIndex = -1, .Reference = NULL};
 
 static _FileDescriptor *findb(FileDescriptor Index)
 {
-        _FileDescriptor *Desc = Files;
-        if (Desc->FileIndex == Index)
-                return Files;
+        _FileDescriptor *Desc = &Files;
         while (Desc->Next)
         {
                 if (Desc->Next->FileIndex == Index)
@@ -22,7 +20,7 @@ static _FileDescriptor *findb(FileDescriptor Index)
 
 static _FileDescriptor *find(FileDescriptor Index)
 {
-        _FileDescriptor *Desc = Files;
+        _FileDescriptor *Desc = &Files;
         while (Desc)
         {
                 if (Desc->FileIndex == Index)
@@ -41,11 +39,11 @@ static FileDescriptor CreateEntry(VNode *Node)
         FileDesc->Reference = Node;
         FileDesc->FileIndex = Current;
         FileDesc->Next = NULL;
-        if (Files == NULL)
-                Files = FileDesc;
+        if (Files.Next == NULL)
+                Files.Next = FileDesc;
         else
         {
-                _FileDescriptor *Desc = Files;
+                _FileDescriptor *Desc = &Files;
                 while (Desc->Next != NULL)
                 {
                         Desc = Desc->Next;
@@ -78,9 +76,12 @@ FileDescriptor open(char *const PathFromRoot, VNodeFlags Flags)
 
 void close(FileDescriptor fd)
 {
-        _FileDescriptor *File = findb(fd);
-        File->Next = File->Next->Next;
-        DeleteVNode(File->Next->Reference);
+        _FileDescriptor *Before = findb(fd);
+        _FileDescriptor *Target = Before->Next;
+        Before->Next = Target->Next;
+        Target->Reference->Flags &= ~VFS_OPENED;  // you set this on open, clear it on close
+        DeleteVNode(Target->Reference);
+        kfree(Target);
 }
 
 unsigned long write(FileDescriptor fd,

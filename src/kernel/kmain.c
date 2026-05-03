@@ -28,6 +28,7 @@ void kmain(unsigned int a, unsigned int b)
         write(File, ArchIdentify(), strnlen(ArchIdentify(), 64));
         write(File, Message, sizeof(Message));
         read(File, InputString, sizeof(InputString) - 1);
+        close(File);
         VNListTree(RootVNode(), 1);
         SerialPrint(" [Mem] %dkb in use (%d/%d)\r\n",
                     (TOTAL_BITMAP - MStat()) * PAGE_SIZE / 1024,
