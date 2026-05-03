@@ -3,6 +3,7 @@
 #include <vmem/alloc.h>
 #include <panic.h>
 #include <string.h>
+#include <arch.h>
 #define __NEXT_PROC
 #include <sched/trap.h>
 
@@ -13,12 +14,14 @@ uint64_t Ticks = 0;
 
 void CommitProcessSave(void)
 {
-        CurrentProc->WriteFunction(&ScratchProc, 1, sizeof(TaskRegisters), CurrentProc);
+        if (CurrentProc)
+                CurrentProc->WriteFunction(&ScratchProc, 1, sizeof(TaskRegisters), CurrentProc);
 }
 
 void CommitProcessLoad(void)
 {
-        CurrentProc->ReadFunction(&ScratchProc, 1, sizeof(TaskRegisters), CurrentProc);
+        if (CurrentProc)
+                CurrentProc->ReadFunction(&ScratchProc, 1, sizeof(TaskRegisters), CurrentProc);
 }
 
 void CommitNextProcess(void)
@@ -92,9 +95,9 @@ VNode *SchedulerCreateProc(TaskRegisters InitialState)
         New->Name.Length   = strnlen(New->Name.Name, 32);
         memcpy(&((Task *)New->DriverData)->Registers, &InitialState, sizeof(InitialState));
         ((Task *)New->DriverData)->ProgramIdentifier = ProgramIdentifier++;
-        ((Task *)New->DriverData)->Files.FileIndex   = -1;
-        ((Task *)New->DriverData)->Files.Next        = NULL;
-        ((Task *)New->DriverData)->Files.Reference   = NULL;
+        ((Task *)New->DriverData)->Files.FileIndex = -1;
+        ((Task *)New->DriverData)->Files.Next      = NULL;
+        ((Task *)New->DriverData)->Files.Reference = NULL;
         RegisterChildVNode(Proc, New);
         return New;
 }
@@ -106,4 +109,28 @@ void SchedulerInitialise(void)
         SchedulerCreateProcDir();
         CurrentProc = SchedulerCreateProc(InitialState);
         EnableNextProcess();
+}
+
+void SchedulerExit(void)
+{
+        ArchCli();
+        VNode *Prev = Proc->FirstChild;
+        if (Prev == CurrentProc)
+        {
+                Proc->FirstChild = CurrentProc->Next;
+        }
+        else
+        {
+                while (Prev != NULL && Prev->Next != CurrentProc)
+                        Prev = Prev->Next;
+                if (Prev != NULL)
+                        Prev->Next = CurrentProc->Next;
+        }
+
+        kfree(CurrentProc->DriverData);
+        UnregisterVNode(CurrentProc);
+        kfree(CurrentProc);
+        CurrentProc = NULL;
+        ArchSti();
+        while(1);
 }

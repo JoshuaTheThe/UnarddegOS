@@ -78,5 +78,6 @@ VNode *RootVNode(void);
 void   VNodeDefault(VNode *Node);
 void   VNodeSeek(VNode *Node, long SeekOffset, int SeekType);
 void   VNListTree(VNode *Base, int Depth);
+void   UnregisterVNode(VNode *const Node);
 
 #endif

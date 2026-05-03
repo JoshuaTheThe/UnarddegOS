@@ -8,7 +8,7 @@ void Hello(void)
         ArchSti();
         for (int i = 0; i < 64; ++i)
                 SerialPrint(" [Proc] Hello, World! x%d\r\n", i);
-        while(1);
+        SchedulerExit();
 }
 
 int Init(void)

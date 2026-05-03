@@ -267,3 +267,17 @@ void VNListTree(VNode *Base, int Depth)
                 Base = Base->Next;
         }
 }
+
+void UnregisterVNode(VNode *const Node)
+{
+        PanicIfNull(Node);
+        if (Node->Previous != NULL)
+                Node->Previous->Next = Node->Next;
+        if (Node->Next != NULL)
+                Node->Next->Previous = Node->Previous;
+        if (Node->Parent != NULL && Node->Parent->FirstChild == Node)
+                Node->Parent->FirstChild = Node->Next;
+        Node->Next     = NULL;
+        Node->Previous = NULL;
+        Node->Parent   = NULL;
+}
