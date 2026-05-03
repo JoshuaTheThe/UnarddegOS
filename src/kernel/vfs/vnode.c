@@ -1,6 +1,6 @@
 
 #include <panic.h>
-#include <vmem/bumpalloc.h> // replace with kernel allocator in future
+#include <vmem/alloc.h> // replace with kernel allocator in future
 #include <vfs/vnode.h>
 #include <string.h>
 
@@ -206,7 +206,7 @@ void VNodeDefault(VNode *Node)
 VNode *NewVNode(VNodeFlags Flags)
 {
         // panics on fail, memsets automatically
-        VNode *NewNode = BumpAllocate(sizeof(*NewNode));
+        VNode *NewNode = kalloc(sizeof(*NewNode));
         NewNode->Flags = Flags;
         NewNode->FileOffset = 0;
         VNodeDefault(NewNode);

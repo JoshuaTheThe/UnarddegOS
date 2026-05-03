@@ -2,7 +2,7 @@
 #include <pci/main.h>
 #include <vfs/vnode.h>
 #include <drivers/serial.h>
-#include <vmem/bumpalloc.h>
+#include <vmem/alloc.h>
 #include <panic.h>
 #include <string.h>
 
@@ -275,7 +275,7 @@ static int PCIWriteFunction(void *const Buf,
 
 int Init(void)
 {
-        PCI   *Pci = BumpAllocate(sizeof(PCI));
+        PCI   *Pci = kalloc(sizeof(PCI));
         VNode *DevFile = RootVNode()->RelativeFind(RootVNode(), "dev", 3);
         if (!DevFile)
                 return -1;

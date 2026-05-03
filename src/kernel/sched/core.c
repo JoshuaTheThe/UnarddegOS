@@ -1,6 +1,6 @@
 
 #include <sched/core.h>
-#include <vmem/bumpalloc.h>
+#include <vmem/alloc.h>
 #include <panic.h>
 #include <string.h>
 #define __NEXT_PROC
@@ -85,7 +85,7 @@ static VNode *SchedulerCreateProc(TaskRegisters InitialState)
         static uint64_t ProgramIdentifier = 0;
         Proc               = RootVNode()->RelativeFind(RootVNode(), ProcDir, sizeof(ProcDir) - 1);
         VNode *New         = NewVNode(VFS_SYSTEM | VFS_READ | VFS_WRITE);
-        New->DriverData    = BumpAllocate(sizeof(Task));
+        New->DriverData    = kalloc(sizeof(Task));
         New->WriteFunction = TaskWriteFunction;
         New->ReadFunction  = TaskReadFunction;
         New->Name.Name     = UlToString(ProgramIdentifier);

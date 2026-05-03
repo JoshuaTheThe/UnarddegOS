@@ -2,7 +2,7 @@
 #include <arch.h>
 #include <vfs/vnode.h>
 #include <panic.h>
-#include <vmem/bumpalloc.h>
+#include <vmem/alloc.h>
 #include <string.h>
 
 IDEDriver_t IDEState = {0};
@@ -425,7 +425,7 @@ void IDEInitialise(void)
                         if (count < 4) // simple char name for now
                         {
                                 VNode *Drv = NewVNode(VFS_READ | VFS_WRITE);
-                                Drv->Name.Name = BumpAllocate(0x03);
+                                Drv->Name.Name = kalloc(0x03);
                                 Drv->Name.Length = 0x3;
                                 Drv->WriteFunction = IDEWriteFunction;
                                 Drv->ReadFunction = IDEReadFunction;

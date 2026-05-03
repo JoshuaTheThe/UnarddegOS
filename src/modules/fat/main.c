@@ -1,5 +1,5 @@
 #include <fat/main.h>
-#include <vmem/bumpalloc.h>
+#include <vmem/alloc.h>
 #include <string.h>
 
 DWORD FatTotalSectors(FATBootSector *Bt)

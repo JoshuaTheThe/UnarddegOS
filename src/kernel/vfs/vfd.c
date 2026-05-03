@@ -2,7 +2,7 @@
 #include <panic.h>
 #include <vfs/vfd.h>
 #include <string.h>
-#include <vmem/bumpalloc.h>
+#include <vmem/alloc.h>
 
 _FileDescriptor *Files = NULL;
 
@@ -23,7 +23,7 @@ static FileDescriptor CreateEntry(VNode *Node)
         static FileDescriptor Current = 0;
         Node->Flags |= VFS_OPENED;
         // panics on fail, no null check needed
-        _FileDescriptor *FileDesc = BumpAllocate(sizeof(*FileDesc));
+        _FileDescriptor *FileDesc = kalloc(sizeof(*FileDesc));
         FileDesc->Reference = Node;
         FileDesc->FileIndex = Current;
         FileDesc->Next = NULL;

@@ -1,6 +1,7 @@
 
 #include <vmem/bitmap.h>
 #include <string.h>
+#include <panic.h>
 
 static uint8_t   PageBitmap[TOTAL_BITMAP / 8] = {0};
 static uintptr_t MemoryStart = 0x400000;
@@ -32,7 +33,8 @@ void FreePage(void *Page)
 void *AllocatePage(void)
 {
         int PageIdx = GetFreePage();
-        if (PageIdx == -1) return NULL;
+        if (PageIdx == -1)
+                Panic(PANIC_RAN_OUT_OF_MEMORY);
         void *Page = (void*)(MemoryStart + (PageIdx * PAGE_SIZE));
         memset(Page, 0, PAGE_SIZE);
         return Page;

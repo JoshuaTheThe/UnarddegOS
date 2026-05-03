@@ -2,7 +2,7 @@
 #include <vfs/vnode.h>
 #include <vfs/dev/serial.h>
 #include <drivers/serial.h>
-#include <vmem/bumpalloc.h>
+#include <vmem/alloc.h>
 #include <panic.h>
 
 // NOTICE - All devices using this
@@ -74,7 +74,7 @@ VNode *CreateSerialDevice(const char *const Name, unsigned long NameLength, VNod
         NewSerialDevice->Name.Length = NameLength;
         NewSerialDevice->ReadFunction = SerialReadFunction;
         NewSerialDevice->WriteFunction = SerialWriteFunction;
-        NewSerialDevice->DriverData = BumpAllocate(sizeof(TTYFlags));
+        NewSerialDevice->DriverData = kalloc(sizeof(TTYFlags));
         *(TTYFlags *)NewSerialDevice->DriverData = TTY_COOKED | TTY_ECHO | TTY_NLCR | TTY_CRNL;
         RegisterChildVNode(Devices, NewSerialDevice);
         NewSerialDevice->WriteFunction(" [Info] Created Serial Virtual Node\r\n",
