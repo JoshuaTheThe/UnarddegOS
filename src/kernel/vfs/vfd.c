@@ -6,6 +6,20 @@
 
 _FileDescriptor *Files = NULL;
 
+static _FileDescriptor *findb(FileDescriptor Index)
+{
+        _FileDescriptor *Desc = Files;
+        if (Desc->FileIndex == Index)
+                return Files;
+        while (Desc->Next)
+        {
+                if (Desc->Next->FileIndex == Index)
+                        return Desc;
+                Desc = Desc->Next;
+        }
+        Panic(PANIC_FD_NOT_FOUND);
+}
+
 static _FileDescriptor *find(FileDescriptor Index)
 {
         _FileDescriptor *Desc = Files;
@@ -60,6 +74,13 @@ FileDescriptor open(char *const PathFromRoot, VNodeFlags Flags)
         if (Node->Flags & VFS_OPENED)
                 Panic(PANIC_DOUBLE_OPEN);
         return CreateEntry(Node);
+}
+
+void close(FileDescriptor fd)
+{
+        _FileDescriptor *File = findb(fd);
+        File->Next = File->Next->Next;
+        DeleteVNode(File->Next->Reference);
 }
 
 unsigned long write(FileDescriptor fd,

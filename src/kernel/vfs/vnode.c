@@ -213,10 +213,17 @@ VNode *NewVNode(VNodeFlags Flags)
         return NewNode;
 }
 
-void DeleteNode(VNode *Node)
+void DeleteVNode(VNode *Node)
 {
         PanicIfNull(Node);
-        (void)Node; // bump allocator does not allow resource freeing
+        VNode *Child = Node->FirstChild;
+        if (Child)
+        {
+                VNode *Next = Child->Next;
+                DeleteVNode(Child);
+                Child = Next;
+        }
+        kfree(Node);
         return;
 }
 

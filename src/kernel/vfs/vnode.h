@@ -71,7 +71,7 @@ enum
 // finds all drives and devices, which may find all files upon asking
 
 VNode *NewVNode(VNodeFlags Flags);
-void   DeleteVNode(void);
+void   DeleteVNode(VNode *Node);
 void   RegisterChildVNode(VNode *const Parent, VNode *const Child);
 void   RegisterSiblingVNode(VNode *const Base, VNode *const Child);
 VNode *RootVNode(void);

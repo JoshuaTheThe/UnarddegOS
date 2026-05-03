@@ -55,4 +55,3 @@ void *AllocatePage(void)
         memset(Page, 0, PAGE_SIZE);
         return Page;
 }
-

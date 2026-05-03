@@ -20,6 +20,7 @@ typedef struct _FileDescriptor
 } _FileDescriptor;
 
 FileDescriptor open(char *const PathFromRoot, VNodeFlags Flags);
+void close(FileDescriptor fd);
 unsigned long write(FileDescriptor fd,
                     void *const Buf,
                     unsigned long Count);
@@ -28,7 +29,6 @@ unsigned long read(FileDescriptor fd,
                    unsigned long Count);
 long lseek(FileDescriptor fd,
            long Offset, int Whence);
-// close would follow but there is no way to free memory (yet)
 
 #endif
 
