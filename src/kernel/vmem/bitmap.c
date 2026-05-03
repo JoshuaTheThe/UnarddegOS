@@ -3,7 +3,7 @@
 #include <string.h>
 
 static uint8_t   PageBitmap[TOTAL_BITMAP / 8] = {0};
-static uintptr_t MemoryStart = 0x100000;
+static uintptr_t MemoryStart = 0x400000;
 
 int GetFreePage(void)
 {
