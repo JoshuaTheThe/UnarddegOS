@@ -29,6 +29,9 @@ void kmain(unsigned int a, unsigned int b)
         write(File, Message, sizeof(Message));
         read(File, InputString, sizeof(InputString) - 1);
         VNListTree(RootVNode(), 1);
+        SerialPrint(" [Mem] %dkb in use (%d/%d)\r\n",
+                    (TOTAL_BITMAP - MStat()) * PAGE_SIZE / 1024,
+                    TOTAL_BITMAP - MStat(), TOTAL_BITMAP);
         Panic(PANIC_TODO);
         while(1);
 }

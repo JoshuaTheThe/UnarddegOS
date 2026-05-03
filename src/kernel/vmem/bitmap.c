@@ -6,6 +6,22 @@
 static uint8_t   PageBitmap[TOTAL_BITMAP / 8] = {0};
 static uintptr_t MemoryStart = 0x400000;
 
+size_t MStat(void)
+{
+        size_t Free = 0;
+        for (size_t i = 0; i < TOTAL_BITMAP; i++)
+        {
+                size_t ByteIdx = i / 8;
+                size_t BitIdx = i % 8;
+                if (!(PageBitmap[ByteIdx] & (1 << BitIdx)))
+                {
+                        Free += 1;
+                }
+        }
+
+        return Free;
+}
+
 int GetFreePage(void)
 {
         for (size_t i = 0; i < TOTAL_BITMAP; i++)

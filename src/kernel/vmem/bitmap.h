@@ -12,6 +12,7 @@ void InitPageAllocator(uintptr_t StartAddress, size_t MemorySize);
 int GetFreePage(void);
 void FreePage(void *Page);
 void *AllocatePage(void);
+size_t MStat(void);
 
 #endif
 
