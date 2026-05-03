@@ -60,7 +60,6 @@ long lseek(FileDescriptor fd, long Offset, int Whence)
         return File->Reference->FileOffset;
 }
 
-// snippet from my vfs impl
 FileDescriptor open(char *const PathFromRoot, VNodeFlags Flags)
 {
         (void)Flags;
@@ -78,7 +77,7 @@ void close(FileDescriptor fd)
         _FileDescriptor *Before = findb(fd);
         _FileDescriptor *Target = Before->Next;
         Before->Next = Target->Next;
-        Target->Reference->Flags &= ~VFS_OPENED;  // you set this on open, clear it on close
+        Target->Reference->Flags &= ~VFS_OPENED;
         DeleteVNode(Target->Reference);
         kfree(Target);
 }
