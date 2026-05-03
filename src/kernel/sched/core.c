@@ -80,7 +80,7 @@ static void SchedulerCreateProcDir(void)
         RegisterChildVNode(Proc, Self);
 }
 
-static VNode *SchedulerCreateProc(TaskRegisters InitialState)
+VNode *SchedulerCreateProc(TaskRegisters InitialState)
 {
         static uint64_t ProgramIdentifier = 0;
         Proc               = RootVNode()->RelativeFind(RootVNode(), ProcDir, sizeof(ProcDir) - 1);

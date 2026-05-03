@@ -14,6 +14,7 @@ typedef struct
 } Task;
 
 void SchedulerInitialise(void);
+VNode *SchedulerCreateProc(TaskRegisters InitialState);
 
 extern VNode *CurrentProc;
 extern Task ScratchProc;
