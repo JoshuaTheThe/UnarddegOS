@@ -13,12 +13,12 @@ uint64_t Ticks = 0;
 
 void CommitProcessSave(void)
 {
-        CurrentProc->WriteFunction(&ScratchProc, 1, sizeof(Task), CurrentProc);
+        CurrentProc->WriteFunction(&ScratchProc, 1, sizeof(TaskRegisters), CurrentProc);
 }
 
 void CommitProcessLoad(void)
 {
-        CurrentProc->ReadFunction(&ScratchProc, 1, sizeof(Task), CurrentProc);
+        CurrentProc->ReadFunction(&ScratchProc, 1, sizeof(TaskRegisters), CurrentProc);
 }
 
 void CommitNextProcess(void)
@@ -92,6 +92,9 @@ VNode *SchedulerCreateProc(TaskRegisters InitialState)
         New->Name.Length   = strnlen(New->Name.Name, 32);
         memcpy(&((Task *)New->DriverData)->Registers, &InitialState, sizeof(InitialState));
         ((Task *)New->DriverData)->ProgramIdentifier = ProgramIdentifier++;
+        ((Task *)New->DriverData)->Files.FileIndex   = -1;
+        ((Task *)New->DriverData)->Files.Next        = NULL;
+        ((Task *)New->DriverData)->Files.Reference   = NULL;
         RegisterChildVNode(Proc, New);
         return New;
 }

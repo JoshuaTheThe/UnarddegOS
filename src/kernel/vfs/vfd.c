@@ -3,12 +3,11 @@
 #include <vfs/vfd.h>
 #include <string.h>
 #include <vmem/alloc.h>
-
-_FileDescriptor Files = {.Next = NULL, .FileIndex = -1, .Reference = NULL};
+#include <sched/core.h>
 
 static _FileDescriptor *findb(FileDescriptor Index)
 {
-        _FileDescriptor *Desc = &Files;
+        _FileDescriptor *Desc = &((Task *)CurrentProc->DriverData)->Files;
         while (Desc->Next)
         {
                 if (Desc->Next->FileIndex == Index)
@@ -20,7 +19,7 @@ static _FileDescriptor *findb(FileDescriptor Index)
 
 static _FileDescriptor *find(FileDescriptor Index)
 {
-        _FileDescriptor *Desc = &Files;
+        _FileDescriptor *Desc = &((Task *)CurrentProc->DriverData)->Files;
         while (Desc)
         {
                 if (Desc->FileIndex == Index)
@@ -39,11 +38,11 @@ static FileDescriptor CreateEntry(VNode *Node)
         FileDesc->Reference = Node;
         FileDesc->FileIndex = Current;
         FileDesc->Next = NULL;
-        if (Files.Next == NULL)
-                Files.Next = FileDesc;
+        if (((Task *)CurrentProc->DriverData)->Files.Next == NULL)
+                ((Task *)CurrentProc->DriverData)->Files.Next = FileDesc;
         else
         {
-                _FileDescriptor *Desc = &Files;
+                _FileDescriptor *Desc = &((Task *)CurrentProc->DriverData)->Files;
                 while (Desc->Next != NULL)
                 {
                         Desc = Desc->Next;
