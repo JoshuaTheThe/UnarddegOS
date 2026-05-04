@@ -10,6 +10,7 @@
 #define VFS_MOUNTED (0x20) // treat the linked file as a device // directory
 #define VFS_OPENED  (0x40)
 #define VFS_ONDISK  (0x80) // children are on disk for the given file system, loaded via ConstructChildren
+#define VFS_DELETE  (0x100)// delete on close
 
 struct VNode;
 
@@ -23,7 +24,7 @@ typedef void (*VNodeFunction)(struct VNode *const Node);
 typedef void (*VNodeConstructFunction)(struct VNode *const Node, unsigned long MaxDepth);
 typedef struct VNode *(*VNodeFindFunction)(struct VNode *Base, const char *const RelativePath, unsigned long RelativePathLength);
 
-typedef unsigned char VNodeFlags;
+typedef unsigned int VNodeFlags;
 
 typedef struct
 {

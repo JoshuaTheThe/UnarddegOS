@@ -95,9 +95,10 @@ VNode *SchedulerCreateProc(TaskRegisters InitialState)
         New->Name.Length   = strnlen(New->Name.Name, 32);
         memcpy(&((Task *)New->DriverData)->Registers, &InitialState, sizeof(InitialState));
         ((Task *)New->DriverData)->ProgramIdentifier = ProgramIdentifier++;
-        ((Task *)New->DriverData)->Files.FileIndex = -1;
-        ((Task *)New->DriverData)->Files.Next      = NULL;
-        ((Task *)New->DriverData)->Files.Reference = NULL;
+        ((Task *)New->DriverData)->Files.FileIndex   = -1;
+        ((Task *)New->DriverData)->Files.Next        = NULL;
+        ((Task *)New->DriverData)->Files.Reference   = NULL;
+        ((Task *)New->DriverData)->BaseDir           = RootVNode();
         RegisterChildVNode(Proc, New);
         return New;
 }
@@ -127,9 +128,16 @@ void SchedulerExit(void)
                         Prev->Next = CurrentProc->Next;
         }
 
+        Task *Tsk = CurrentProc->DriverData;
+        _FileDescriptor *Desc = Tsk->Files.Next;
+        while (Desc)
+        {
+                close(Desc->FileIndex);
+                Desc=Desc->Next;
+        }
         kfree(CurrentProc->DriverData);
         UnregisterVNode(CurrentProc);
-        kfree(CurrentProc);
+        DeleteVNode(CurrentProc);
         CurrentProc = NULL;
         ArchSti();
         while(1);

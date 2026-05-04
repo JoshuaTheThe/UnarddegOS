@@ -12,6 +12,7 @@ typedef struct
         TaskRegisters   Registers;
         uint64_t        ProgramIdentifier;
         _FileDescriptor Files;
+        VNode          *BaseDir;
 } Task;
 
 void SchedulerInitialise(void);

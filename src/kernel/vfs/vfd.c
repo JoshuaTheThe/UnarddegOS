@@ -78,7 +78,8 @@ void close(FileDescriptor fd)
         _FileDescriptor *Target = Before->Next;
         Before->Next = Target->Next;
         Target->Reference->Flags &= ~VFS_OPENED;
-        DeleteVNode(Target->Reference);
+        if (Target->Reference->Flags & VFS_DELETE)
+                DeleteVNode(Target->Reference);
         kfree(Target);
 }
 
@@ -100,3 +101,14 @@ unsigned long read(FileDescriptor fd,
         return File->Reference->ReadFunction(Buf, Count, 1, File->Reference);
 }
 
+void chdir(const char *path)
+{
+        Task *TaskState = CurrentProc->DriverData;
+        TaskState->BaseDir = RootVNode()->RelativeFind(TaskState->BaseDir, path, strnlen(path, 256));
+}
+
+VNode *cdir(void)
+{
+        Task *TaskState = CurrentProc->DriverData;
+        return TaskState->BaseDir;
+}

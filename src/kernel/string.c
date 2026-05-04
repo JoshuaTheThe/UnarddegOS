@@ -71,3 +71,20 @@ void memcpy(void *Destination, const void *const Source, const unsigned long Len
                 ((char *)Destination)[i] = ((char *)Source)[i];
         }
 }
+
+void strncpy(void *Destination, const void *const Source, const unsigned long Len)
+{
+        char       *Dst = (char *)Destination;
+        const char *Src = (const char *)Source;
+        unsigned long i = 0;
+        while (i < Len && Src[i] != 0)
+        {
+                Dst[i] = Src[i];
+                ++i;
+        }
+        while (i < Len)
+        {
+                Dst[i] = 0;
+                ++i;
+        }
+}

@@ -6,6 +6,9 @@
 #include <vfs/vnode.h>
 #include <string.h>
 
+#pragma pack(push)
+#pragma pack(1)
+
 typedef uint8_t  BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
@@ -39,7 +42,7 @@ typedef enum
         FAT_32,
 } FATType;
 
-typedef struct __attribute__((__packed__))
+typedef struct 
 {
         BYTE __jmp_nop[3]; /* e.g. JMP _Start followed by a NOP instruction */
         BYTE OEMIdentifier[8];
@@ -57,7 +60,7 @@ typedef struct __attribute__((__packed__))
         DWORD ExtendedSectorCount; /* offset 0x20 */
 } FATBiosParameterBlock;
 
-typedef struct __attribute__((__packed__))
+typedef struct 
 {
         BYTE DriveNum;
         BYTE Reserved;
@@ -68,7 +71,7 @@ typedef struct __attribute__((__packed__))
         BYTE BootCode[448];
 } FATExtBootRecord_16;
 
-typedef struct __attribute__((__packed__))
+typedef struct 
 {
         DWORD SectorsPerFAT;
         WORD Flags;
@@ -86,7 +89,7 @@ typedef struct __attribute__((__packed__))
         BYTE BootCode[420];
 } FATExtBootRecord_32;
 
-typedef struct __attribute__((__packed__))
+typedef struct 
 {
         DWORD SignatureA;
         BYTE Reserved[480];
@@ -97,7 +100,7 @@ typedef struct __attribute__((__packed__))
         DWORD SignatureC;
 } FATInfo_32;
 
-typedef struct __attribute__((__packed__))
+typedef struct 
 {
         FATBiosParameterBlock bpb;
 
@@ -110,21 +113,38 @@ typedef struct __attribute__((__packed__))
         WORD Magic; /* 0xAA55 */
 } FATBootSector;
 
-typedef struct __attribute__((__packed__))
+typedef struct
+{
+        BYTE  Status;
+        BYTE  CHSFirst[3];
+        BYTE  Type;
+        BYTE  CHSLast[3];
+        DWORD LBAStart;
+        DWORD SectorCount;
+} MBRPartitionEntry;
+
+typedef struct
+{
+        BYTE              Bootstrap[446];
+        MBRPartitionEntry Partitions[4];
+        WORD              Signature;
+} MBR;
+
+typedef struct 
 {
         BYTE Hour : 5;
         BYTE Minutes : 6;
         BYTE Seconds : 5; /* Multiply By 2 */
 } FATTime;
 
-typedef struct __attribute__((__packed__))
+typedef struct 
 {
         BYTE Year : 7;
         BYTE Month : 4;
         BYTE Day : 5;
 } FATDate;
 
-typedef struct __attribute__((__packed__))
+typedef struct 
 {
         BYTE Name[8], Ext[3];
         BYTE Flags;
@@ -140,7 +160,7 @@ typedef struct __attribute__((__packed__))
         DWORD Size; /* Bytes */
 } FATDirectory;
 
-typedef struct __attribute__((__packed__))
+typedef struct 
 {
         FATDirectory Dir;
         DWORD Cluster;
@@ -149,9 +169,20 @@ typedef struct __attribute__((__packed__))
         bool Found;
 } FATFileLocation;
 
-typedef struct __attribute__((__packed__))
+typedef struct 
 {
         /* TODO - we dont care for now*/
 } FATLongFileName;
+
+typedef struct
+{
+        FATBootSector   Boot;
+        DWORD           PartitionLBA; /* in sectors */
+        VNode          *Drive;
+} FATVolume;
+
+void FatConvert83(const char *path, char *NameOut, char *ExtOut);
+
+#pragma pack(pop)
 
 #endif

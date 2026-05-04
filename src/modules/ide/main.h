@@ -7,6 +7,9 @@
 #include <stdint.h>
 #include <io.h>
 
+#pragma pack(push)
+#pragma pack(1)
+
 #define ATA_SR_BSY 0x80  // Busy
 #define ATA_SR_DRDY 0x40 // Drive ready
 #define ATA_SR_DF 0x20   // Drive write fault
@@ -119,5 +122,7 @@ void IDEReadSectors(unsigned char drive, unsigned char numsects, unsigned int lb
                     unsigned short es, uintptr_t edi);
 void IDEWriteSectors(unsigned char drive, unsigned char numsects, unsigned int lba,
                        unsigned short es, uintptr_t edi);
+
+#pragma pack(pop)
 
 #endif

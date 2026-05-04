@@ -30,5 +30,8 @@ unsigned long read(FileDescriptor fd,
 long lseek(FileDescriptor fd,
            long Offset, int Whence);
 
+void chdir(const char *path);
+VNode *cdir(void);
+
 #endif
 
