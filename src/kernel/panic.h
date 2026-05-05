@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <drivers/serial.h>
 
-#define Panic(Code) PanicImpl(__FILE__, __LINE__, Code, #Code)
+#define Panic(Code) PanicImpl(__FILE__, __LINE__, Code, #Code, PANIC_CLASS_SUPERVISOR)
 #define PanicIfNull(e) do { if ((e) == NULL) Panic(PANIC_NULL_POINTER_DEREFERENCE); } while (0)
 
 #define DEBUG
@@ -34,6 +34,12 @@ typedef enum
         PANIC_UNHANDLED_INTERRUPT,
 } PanicCode;
 
+typedef enum
+{
+        PANIC_CLASS_SUPERVISOR,  // Kernel bug (no user involvement)
+        PANIC_CLASS_USERSPACE,   // Kernel bug triggered by user process (e.g. bad address)
+} PanicClass;
+
 typedef struct
 {
         const char *FileName;
@@ -41,7 +47,7 @@ typedef struct
         long        Line;
 } TraceEntry;
 
-_Noreturn void PanicImpl(const char *const File, long Line, PanicCode Code, const char *const CodeAsStr);
+_Noreturn void PanicImpl(const char *const File, long Line, PanicCode Code, const char *const CodeAsStr, PanicClass Class);
 void TraceImpl(const char *const File, const char *const Func, long Line);
 void ExitTraceImpl(const char *const File, const char *const Func, long Line);
 

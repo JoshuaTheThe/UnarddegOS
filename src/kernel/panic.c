@@ -26,10 +26,10 @@ void ExitTraceImpl(const char *const File, const char *const Func, long Line)
         memset(&FunctionTrace[FunctionTraceDepth], 0, sizeof(TraceEntry));
 }
 
-_Noreturn void PanicImpl(const char *const File, long Line, PanicCode Code, const char *const CodeAsStr)
+_Noreturn void PanicImpl(const char *const File, long Line, PanicCode Code, const char *const CodeAsStr, PanicClass Class)
 {
         ArchCli(); // disable interrupts and say, context switching timers for given architecture
-        SerialPrint("\r\n -- KERNEL PANIC -- \r\n");
+        SerialPrint("\r\n -- KERNEL PANIC VIA %s -- \r\n", Class == PANIC_CLASS_SUPERVISOR ? "SUPERVISOR" : "USERSPACE");
         SerialPrint("Kernel Panic Function %x (%s) was raised\r\n", Code, CodeAsStr);
         #ifdef HAS_TEMPERATURE
         SerialPrint("Temperature x1000: %d\r\n", ArchGetTemperatureMC());
