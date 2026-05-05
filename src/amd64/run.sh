@@ -19,7 +19,7 @@ if grub-file --is-x86-multiboot2 bin/unarddegos_amd64.o; then
     sudo grub-install --target=i386-pc --root-directory=/mnt --boot-directory=/mnt/boot ${LOOP}
     sudo mkdir -p /mnt/boot/grub
     sudo cp bin/unarddegos_amd64.o /mnt/boot/
-    sudo cp -rf bin/modules /mnt/boot/
+    #sudo cp -rf bin/modules /mnt/boot/
     sudo cp src/amd64/grub.cfg /mnt/boot/grub/
     sudo umount /mnt
     sudo losetup -d ${LOOP}

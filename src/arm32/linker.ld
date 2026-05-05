@@ -16,4 +16,7 @@ SECTIONS {
         _stack_base = .;
         . += 0x20000;  /* Reserve 128KB for the stack */
         _stack_top = .;
+
+        . = ALIGN(4096);
+        MemoryStart = .;
 }

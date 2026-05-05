@@ -32,6 +32,7 @@ typedef enum
         PANIC_FD_NOT_FOUND,
         PANIC_INCORRECT_BOOTLOADER,
         PANIC_UNHANDLED_INTERRUPT,
+        PANIC_OVERHEAT,
 } PanicCode;
 
 typedef enum

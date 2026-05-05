@@ -11,7 +11,7 @@ SECTIONS {
 	.bss : ALIGN(4K) {
 		PROVIDE(bss_start = .);
 		*(.bss);
-		. += 4096;
+		. += 4096*8;
 		PROVIDE(stack_top = .);
 		. += 4096;
 		PROVIDE(global_pointer = .);
@@ -23,4 +23,7 @@ SECTIONS {
 	.data : ALIGN(4K) {
 		*(.data);
 	}
+
+        . = ALIGN(4096);
+        MemoryStart = .;
 }

@@ -8,4 +8,4 @@ override ARCH_RUN_SCRIPT := src/ia32/run.sh
 override ARCH_MODULE_FLAGS := -mno-tls-direct-seg-refs -fno-tls-model -U__TLS__
 override KCC = clang
 
-MODULE_NAMES += pci ide fat shell
+MODULE_NAMES += pci ide fat shell hello

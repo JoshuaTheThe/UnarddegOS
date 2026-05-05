@@ -3,8 +3,8 @@
 #include <string.h>
 #include <panic.h>
 
-static uint8_t   PageBitmap[TOTAL_BITMAP / 8] = {0};
-static uintptr_t MemoryStart = 0x400000;
+extern uint8_t MemoryStart[];
+uint8_t PageBitmap[TOTAL_BITMAP / 8] = {0};
 
 size_t MStat(void)
 {
@@ -40,7 +40,7 @@ int GetFreePage(void)
 void FreePage(void *Page)
 {
         uintptr_t Addr = (uintptr_t)Page;
-        size_t PageIdx = (Addr - MemoryStart) / PAGE_SIZE;
+        size_t PageIdx = (Addr - (uintptr_t)&MemoryStart) / PAGE_SIZE;
         size_t ByteIdx = PageIdx / 8;
         size_t BitIdx = PageIdx % 8;
         PageBitmap[ByteIdx] &= ~(1 << BitIdx);
@@ -51,7 +51,7 @@ void *AllocatePage(void)
         int PageIdx = GetFreePage();
         if (PageIdx == -1)
                 Panic(PANIC_RAN_OUT_OF_MEMORY);
-        void *Page = (void*)(MemoryStart + (PageIdx * PAGE_SIZE));
+        void *Page = (void*)((uintptr_t)&MemoryStart + (PageIdx * PAGE_SIZE));
         memset(Page, 0, PAGE_SIZE);
         return Page;
 }

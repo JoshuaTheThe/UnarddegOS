@@ -91,4 +91,7 @@ SECTIONS
                 *(.comment)
                 *(.comment.*)
         }
+
+        . = ALIGN(4096);
+        MemoryStart = .;
 }
