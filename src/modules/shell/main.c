@@ -60,7 +60,7 @@ int Parse(char *b, char cmd[MARGS][CMDM_LEN])
         return N;
 }
 
-void SystemCommand(char *sys)
+bool SystemCommand(char *sys)
 {
         char cmd[MARGS][CMDM_LEN];
         memset(cmd, 0, sizeof(cmd));
@@ -88,6 +88,12 @@ void SystemCommand(char *sys)
                         Ele = Ele->Next;
                 }
         }
+        else if (!strncmp(cmd[0], "exit", 4))
+        {
+                return false;
+        }
+
+        return true;
 }
 
 int Init(void)
@@ -96,12 +102,13 @@ int Init(void)
         CurrentNode = RootVNode();
         FileDescriptor fd = open("/dev/tty0", 0);
         SystemCommand("goober");
-        while (true)
+        bool running = true;
+        while (running)
         {
                 memset(Buffer, 0, 256);
                 SerialPrint("\\`(owo`)o -> ");
                 read(fd, &Buffer, sizeof(Buffer));
-                SystemCommand(Buffer);
+                running = SystemCommand(Buffer);
         }
 
         close(fd);
