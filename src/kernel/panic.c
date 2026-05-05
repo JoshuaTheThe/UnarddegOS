@@ -32,7 +32,7 @@ _Noreturn void PanicImpl(const char *const File, long Line, PanicCode Code, cons
         ArchCli(); // disable interrupts and say, context switching timers for given architecture
         SerialPrint("\r\n -- KERNEL PANIC VIA %s IN PROCESS %d -- \r\n",
                     Class == PANIC_CLASS_SUPERVISOR ? "SUPERVISOR" : "USERSPACE",
-                    ((Task *)CurrentProc->DriverData)->ProgramIdentifier);
+                    CurrentProc && CurrentProc->DriverData ? ((Task *)CurrentProc->DriverData)->ProgramIdentifier : 0);
         SerialPrint("Kernel Panic Function %x (%s) was raised\r\n", Code, CodeAsStr);
         #ifdef HAS_TEMPERATURE
         SerialPrint("Temperature x1000: %d\r\n", ArchGetTemperatureMC());
