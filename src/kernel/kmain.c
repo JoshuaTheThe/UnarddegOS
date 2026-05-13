@@ -16,8 +16,8 @@ void kmain(unsigned int a, unsigned int b)
 {
         static char Message[] = " [Info] Found tty0 VNode Successfully\n";
         static char InputString[16];
-        ArchInitialise(a, b);
         VFSCreateDevices();
+        ArchInitialise(a, b);
         SchedulerInitialise();
         ArchSti();
         #ifdef MODULE

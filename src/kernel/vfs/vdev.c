@@ -12,14 +12,20 @@ void VFSCreateDevices(void)
         RootVNode()->Name.Name = "root";
         RootVNode()->Name.Length = 4;
 
-        VNode *Node;
+        VNode *Node, *Sys;
         
         // Create /dev
         // panic on fail, trace is macro so we know where we came from
-        Trace(Node = NewVNode(VFS_READ | VFS_WRITE));
+        Trace(Node = NewVNode(VFS_SYSTEM));
         Trace((void)RegisterChildVNode(RootVNode(), Node));
         Node->Name.Name   = "dev";
         Node->Name.Length = 3;
+
+        // Create /sys
+        Trace(Sys = NewVNode(VFS_SYSTEM));
+        Trace((void)RegisterChildVNode(RootVNode(), Sys));
+        Sys->Name.Name   = "sys";
+        Sys->Name.Length = 3;
 
         // create devices
         Trace((void)CreateNullDevice  ("null", 4, Node));

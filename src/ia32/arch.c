@@ -7,6 +7,7 @@
 #include <panic.h>
 #include <_arch.h>
 #include <module.h>
+#include <vfs/vnode.h>
 
 enum cpu_vendor
 {
@@ -82,7 +83,6 @@ void TimerInit(uint32_t targetFreq)
 
 void ArchInitialise(unsigned int magic, unsigned int mb_info_addr)
 {
-        (void)mb_info_addr;
         if (magic != 0x36d76289)
         {
                 Panic(PANIC_INCORRECT_BOOTLOADER);
@@ -91,6 +91,13 @@ void ArchInitialise(unsigned int magic, unsigned int mb_info_addr)
         GdtInit();
         IdtInit();
         TimerInit(100);
+
+        SerialPrint(" [Debug] MBI at 0x%x\n", mb_info_addr);
+        VNode *mbootadr = NewVNode(VFS_READ | VFS_WRITE | VFS_SYSTEM);
+        mbootadr->DriverData = (void *)mb_info_addr;
+        mbootadr->Name.Name  = "mbi";
+        mbootadr->Name.Length= 3;
+        RegisterChildVNode(RootVNode()->RelativeFind(RootVNode(), "/sys", 4), mbootadr);
 }
 
 void LoadModules(unsigned int magic, unsigned int mb_info_addr)

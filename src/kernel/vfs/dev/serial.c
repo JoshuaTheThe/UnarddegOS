@@ -21,25 +21,27 @@ static int SerialReadFunction(void *const Buf,
         for (i = 0; i < Bytes; ++i)
         {
                 char chr = SerialRead();
-                if (chr == '\r' && *(TTYFlags *)Node->DriverData & TTY_CRNL)
+                if (chr == '\r' && (*(TTYFlags *)Node->DriverData) & TTY_CRNL)
                         chr = '\n';
-                if (*(TTYFlags *)Node->DriverData & TTY_ECHO)
+                if ((*(TTYFlags *)Node->DriverData) & TTY_ECHO)
                 {
                         Node->WriteFunction(&chr, 1, 1, Node);
                 }
-                if (!(*(TTYFlags *)Node->DriverData & TTY_RAW))
+                if (!((*(TTYFlags *)Node->DriverData) & TTY_RAW))
                 {
-                        if (chr == '\b' && i > 1)
+                        if (chr == '\b' && i > 0)
                         {
                                 i -= 2;
+                                ByteBuf[i] = 0;
+                                continue;
                         }
                 }
-                if (chr == '\n' && *(TTYFlags *)Node->DriverData & TTY_COOKED)
+                if (chr == '\n' && (*(TTYFlags *)Node->DriverData) & TTY_COOKED)
                         break;
                 ByteBuf[i] = chr;
         }
 
-        return i;
+        return i / Size;
 }
 
 // NOTICE - All devices using this
